@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>查看表: {{ table_name }}</title>
+    <link rel="icon" href="data:,">
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #e6f7ff; }
+        .null-val { color: #ccc; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h2>表: {{ table_name }}</h2>
+    <a href="/admin">&larr; 返回仪表盘</a>
+    <br><br>
+
+    <table>
+        <thead>
+            <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for col in columns %}
+                <td>
+                    {% if row[col] is none %}
+                        <span class="null-val">NULL</span>
+                    {% else %}
+                        {{ row[col] }}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

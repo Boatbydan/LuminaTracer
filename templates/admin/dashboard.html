@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>后台管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="data:,">
+    <style>
+        body { padding: 40px; background: #333; color: white; }
+        .card { background: #444; padding: 20px; margin: 10px; border-radius: 5px; display: inline-block; width: 200px; text-align: center; }
+        .card a { color: #4db8ff; text-decoration: none; font-size: 1.2em; font-weight: bold; }
+        .card:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <h1>数据库管理控制台</h1>
+    <p>Database Explorer</p>
+    
+    <div style="margin-bottom: 30px;">
+        <a href="/admin/sql" style="color: yellow;">&gt;_ 进入 SQL 控制台</a> |
+        <a href="/" style="color: #ccc;">返回前台</a>
+    </div>
+
+    <h3>数据表列表:</h3>
+    <div>
+        {% for t in tables %}
+        <div class="card">
+            <a href="/admin/view/{{ t['name'] }}">{{ t['name'] }}</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

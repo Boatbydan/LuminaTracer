@@ -1,0 +1,22 @@
+# normal
+__pycache__
+*.pyc
+venv
+.vscode
+build
+dist
+
+*.obj
+*.o
+*.pyd
+*.db
+*.spec
+
+# record
+ppack
+d_rec
+data
+cpp*
+debug*
+setup*
+migrations

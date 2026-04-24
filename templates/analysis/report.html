@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lumina Tracer Report - {{ meta['name'] }}</title>
+    <style>
+        /* --- 全局设定 --- */
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #e9ecef; 
+            padding: 30px; 
+            color: #212529; 
+        }
+        
+        /* --- A4 纸张模拟 --- */
+        .paper {
+            background: white;
+            width: 210mm;       /* A4 标准宽 */
+            min-height: 297mm;  /* A4 标准高 */
+            padding: 20mm;      /* 打印安全边距 */
+            box-sizing: border-box;
+            margin: 0 auto; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        /* --- 1. 顶部品牌栏 --- */
+        .brand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        /* Logo 组合 */
+        .logo-box { display: flex; align-items: center; }
+        .logo-icon {
+            width: 28px; height: 28px;
+            background: radial-gradient(circle, #fff 10%, #007bff 100%);
+            border-radius: 50%;
+            margin-right: 12px;
+            box-shadow: 0 0 8px rgba(0,123,255,0.4);
+        }
+        .logo-text {
+            font-size: 22px; font-weight: 800; color: #2c3e50; letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .logo-sub { color: #007bff; }
+
+        .report-meta { text-align: right; font-size: 0.85em; color: #666; line-height: 1.4; }
+        .eye-badge {
+            background: #2c3e50; color: white; 
+            padding: 4px 10px; border-radius: 4px; 
+            font-weight: bold; font-size: 1.1em;
+            display: inline-block; margin-bottom: 5px;
+        }
+
+        /* --- 2. 患者与测试信息 (Grid 布局) --- */
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; /* 三列布局 */
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 0.85em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .info-group h4 { margin: 0 0 8px 0; color: #007bff; font-size: 1em; text-transform: uppercase; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .info-label { color: #888; font-weight: 500; }
+        .info-val { font-weight: 600; color: #333; }
+
+        /* --- 3. 核心图像区域 --- */
+        .visual-field-area {
+            text-align: center;
+            margin: 30px 0;
+            min-height: 400px;
+        }
+        .chart-container {
+            display: inline-block;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .chart-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .legend-box {
+            margin-top: 15px;
+            font-size: 0.8em;
+            color: #666;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .legend-item span { font-weight: bold; color: #333; }
+
+        /* --- 4. 底部声明 --- */
+        .footer {
+            margin-top: auto; /* 推到底部 */
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.75em;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* --- 5. 按钮控制区 (不打印) --- */
+        .action-bar {
+            text-align: center; 
+            margin-top: 30px;
+            white-space: nowrap;
+        }
+        .btn {
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 8px 16px; 
+            margin: 0 6px;
+            border: none; 
+            border-radius: 6px;
+            font-size: 13px; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.2s; 
+            text-decoration: none;
+            height: 38px;
+            box-sizing: border-box;
+            min-width: 120px;
+        }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; box-shadow: 0 4px 10px rgba(0,123,255,0.3); }
+        
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-info:hover { background: #138496; }
+        
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+
+        /* --- 打印适配 --- */
+        @media print {
+            body { background: white; padding: 0; }
+            .paper { box-shadow: none; margin: 0; padding: 0; width: 100%; }
+            .action-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="paper">
+        <div class="brand-header">
+            <div class="logo-box">
+                <div class="logo-icon"></div>
+                <div class="logo-text">Lumina <span class="logo-sub">Tracer</span></div>
+            </div>
+            <div class="report-meta">
+                <div class="eye-badge">
+                    {{ 'OS (Left Eye)' if meta['eye'] == 'L' else 'OD (Right Eye)' }}
+                </div>
+                <div>Session ID: <span style="font-family: monospace;">{{ meta['session_id'].split('-')[0] }}...</span></div>
+                <div>Generated: {{ meta['created_at'] }}</div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="info-group">
+                <h4>Patient Profile</h4>
+                <div class="info-row"><span class="info-label">Name</span> <span class="info-val">{{ meta['name'] }}</span></div>
+                <div class="info-row"><span class="info-label">Age / Gender</span> <span class="info-val">{{ meta['age'] }} / {{ meta['gender'] }}</span></div>
+                <div class="info-row"><span class="info-label">Patient ID</span> <span class="info-val">{{ meta['user_id'] }}</span></div>
+            </div>
+
+            <div class="info-group">
+                <h4>Test Parameters</h4>
+                <div class="info-row"><span class="info-label">Strategy</span> <span class="info-val">Adaptive Bayesian</span></div>
+                <div class="info-row"><span class="info-label">Pattern</span> <span class="info-val">{{ meta['test_mode'] or 'Standard 24-2' }}</span></div>
+                <div class="info-row"><span class="info-label">Stimulus</span> <span class="info-val">Size III, White</span></div>
+                <div class="info-row"><span class="info-label">Background</span> <span class="info-val">31.5 ASB</span></div>
+                {% if meta['is_incremental'] %}
+                <div class="info-row" style="color: #007bff; font-weight: 500;"><span class="info-label">Test Type</span> <span class="info-val">Reference Test</span></div>
+                {% if meta.get('reference_test') %}
+                <div class="info-row"><span class="info-label">Reference Test</span> <span class="info-val">{{ meta['reference_test']['created_at'].strftime('%Y-%m-%d %H:%M') }}</span></div>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="info-group">
+                <h4>Reliability Indices</h4>
+                <div class="info-row">
+                    <span class="info-label">Fixation Losses</span> 
+                    <span class="info-val" style="{{ 'color:red;' if (meta['fixation_losses'] > 0 and (meta['fixation_losses'] / (meta['total_catch_trials'] or 1) > 0.3)) else '' }}">
+                        {{ meta['fixation_losses'] }} / {{ meta['total_catch_trials'] }}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">False Positives</span> 
+                    <span class="info-val">{{ meta['false_positives'] or 0 }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Duration</span> 
+                    <span class="info-val">--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="visual-field-area">
+            {% if report_img %}
+                <div class="chart-container">
+                    <img src="data:image/png;base64,{{ report_img }}" class="chart-img" alt="Visual Field Map">
+                </div>
+                <div class="legend-box">
+                    <div class="legend-item"><span>Left:</span> Sensitivity Values (dB)</div>
+                    <div class="legend-item"><span>Right:</span> Interpolated Grayscale Map</div>
+                </div>
+            {% else %}
+                <div style="padding: 80px; background: #f8f9fa; border: 2px dashed #ddd; border-radius: 8px; color: #777;">
+                    <h3>Insufficient Data</h3>
+                    <p>Not enough valid points to generate field topography.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <strong>LUMINA TRACER SYSTEM v1.0</strong> &bull; Perimetry System<br>
+            Analysis based on Thin Plate Spline (TPS) interpolation and ZEST-compatible logic.<br>
+            This report is for reference only and does not replace professional medical diagnosis.
+        </div>
+
+        <div class="action-bar" data-html2canvas-ignore="true">
+            <a href="/user/{{ meta['user_id'] }}" class="btn btn-secondary">
+                &larr; Return to Profile
+            </a>
+            
+            <a href="/prepare_incremental_test?reference_session_id={{ meta['session_id'] }}&eye={{ meta['eye'] }}" class="btn btn-success">
+                Start Reference Test
+            </a>
+            
+            <button onclick="window.print()" class="btn btn-primary">
+                Print Report
+            </button>
+            
+            <button onclick="previewPDF()" class="btn btn-info">
+                Open as PDF (W)
+            </button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js') }}"></script>
+
+    <script>
+        function previewPDF() {
+            const element = document.querySelector('.paper');
+            const btn = event.target;
+            const originalText = btn.innerText;
+
+            btn.innerText = "Generating...";
+            btn.disabled = true;
+            document.body.style.cursor = 'wait';
+
+            const originalMargin = element.style.margin;
+            element.style.margin = '0'; 
+
+            const images = element.querySelectorAll('img');
+            console.log(`Found ${images.length} images in the report`);
+            
+            let allImagesLoaded = true;
+            let loadingImages = [];
+
+            images.forEach((img, index) => {
+                console.log(`Image ${index}:`, {
+                    src: img.src.substring(0, 80) + '...',
+                    complete: img.complete,
+                    naturalWidth: img.naturalWidth,
+                    naturalHeight: img.naturalHeight
+                });
+                
+                if (!img.complete || img.naturalWidth === 0) {
+                    allImagesLoaded = false;
+                    loadingImages.push(index);
+                }
+            });
+
+            if (!allImagesLoaded) {
+                console.log('Waiting for images to load:', loadingImages);
+                
+                let loadedCount = 0;
+                const checkInterval = setInterval(() => {
+                    loadedCount = 0;
+                    images.forEach((img, index) => {
+                        if (img.complete && img.naturalWidth > 0) {
+                            loadedCount++;
+                        }
+                    });
+                    
+                    console.log(`Images loaded: ${loadedCount}/${images.length}`);
+                    
+                    if (loadedCount === images.length) {
+                        clearInterval(checkInterval);
+                        console.log('All images loaded, generating PDF...');
+                        generatePDF(element, btn, originalText, originalMargin);
+                    }
+                }, 100);
+                
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    if (loadedCount < images.length) {
+                        console.warn('Some images failed to load, proceeding anyway');
+                        generatePDF(element, btn, originalText, originalMargin);
+                    }
+                }, 5000);
+            } else {
+                generatePDF(element, btn, originalText, originalMargin);
+            }
+        }
+
+        function generatePDF(element, btn, originalText, originalMargin) {
+            const opt = {
+                margin: 0,
+                filename: `Lumina_Report_${new Date().toISOString().slice(0,10)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    windowWidth: 800,
+                    x: 0,
+                    y: 0,
+                    logging: true,
+                    scrollY: 0,
+                    taintTest: false,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).toPdf().output('datauristring')
+            .then(function(pdfBase64) {
+                element.style.margin = originalMargin;
+                return fetch('/api/system/open_pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pdf_data: pdfBase64 })
+                });
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.body.style.cursor = 'default';
+                if(data.status === 'success') {
+                    btn.innerText = "PDF Opened";
+                } else {
+                    alert("System Viewer Error: " + data.msg);
+                    btn.innerText = "Error";
+                }
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error(err);
+                element.style.margin = originalMargin;
+                document.body.style.cursor = 'default';
+                btn.innerText = "Failed";
+                alert("PDF Generation Failed.");
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

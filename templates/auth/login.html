@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - Lumina Tracer</title>
+    <link rel="icon" href="data:,">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .auth-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* --- 侧边图片区域 (核心修改) --- */
+        .side-image {
+            flex: 1; /* 自动撑开剩余空间 */
+            
+            /* 1. 设置底色 (当图片未填满区域时显示的颜色) */
+            background-color: #0f0f0f; 
+            
+            /* 2. 居中显示 */
+            background-position: center center;
+            
+            /* 3. 禁止平铺 */
+            background-repeat: no-repeat;
+            
+            /* 4. 关键设置：'contain' 会保证正方形完整显示 */
+            /* 如果觉得图片太大，可以改成具体的百分比，例如 '60%' */
+            background-size: contain; 
+            
+            position: relative;
+        }
+
+        /* 左侧图片路径 */
+        .side-image.left {
+            background-image: url("{{ url_for('static', filename='images/auth_left.jpg') }}");
+            /* 可选：如果你想让图片稍微离中间远一点 */
+            background-position: center right 20px; 
+        }
+        
+        /* 右侧图片路径 */
+        .side-image.right {
+            background-image: url("{{ url_for('static', filename='images/auth_right.jpg') }}");
+            /* 可选：如果你想让图片稍微离中间远一点 */
+            background-position: center left 20px;
+        }
+
+        /* --- 中间表单区域 (保持不变) --- */
+        .main-content {
+            flex: 0 0 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #050505;
+            padding: 30px;
+            z-index: 10;
+            /* 给两边加一点阴影，让中间层级更高 */
+            box-shadow: 0 0 60px rgba(0,0,0,1); 
+        }
+
+        .auth-card {
+            background: #121212;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #333;
+            /* 给卡片加一点微光效果 */
+            box-shadow: 0 0 30px rgba(0, 123, 255, 0.1);
+        }
+
+        /* ... 以下样式保持不变 ... */
+        .logo-area { margin-bottom: 35px; }
+        .logo-circle {
+            width: 48px; height: 48px;
+            background: radial-gradient(circle, #fff 10%, #007bff 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.6);
+        }
+        h2 { margin: 0; font-weight: 400; letter-spacing: 2px; color: #fff; font-size: 1.5em; }
+        .form-group { margin-bottom: 25px; text-align: left; }
+        label { display: block; margin-bottom: 10px; font-size: 0.9em; color: #aaa; font-weight: 600; }
+        input {
+            width: 100%; padding: 14px;
+            background: #1e1e1e; border: 1px solid #444;
+            color: white; border-radius: 8px;
+            box-sizing: border-box; outline: none; transition: all 0.3s; font-size: 1em;
+        }
+        input:focus { border-color: #007bff; background: #252525; box-shadow: 0 0 10px rgba(0,123,255,0.2); }
+        .btn-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #007bff 0%, #0062cc 100%); color: white;
+            border: none; border-radius: 8px;
+            font-size: 1.05em; cursor: pointer;
+            font-weight: 600; transition: transform 0.2s; letter-spacing: 1px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,123,255,0.4); }
+        .links { margin-top: 25px; font-size: 0.9em; color: #888; }
+        .links a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .alert {
+            background: rgba(220, 53, 69, 0.25); color: #ff8888; padding: 12px;
+            border-radius: 8px; margin-bottom: 25px; font-size: 0.9em; border: 1px solid #dc3545;
+        }
+
+        @media (max-width: 900px) {
+            .side-image { display: none; }
+            .main-content { flex: 1; }
+            .auth-card { box-shadow: none; border: none; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="side-image left"></div>
+
+        <div class="main-content">
+            <div class="auth-card">
+                <div class="logo-area">
+                    <div class="logo-circle"></div>
+                    <h2>LUMINA TRACER</h2>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <div class="alert">⚠️ {{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label>邮箱地址 (Email Address)</label>
+                        <input type="email" name="email" required placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>密码 (Password)</label>
+                        <input type="password" name="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-submit">登录 (Sign In)</button>
+                </form>
+
+                <div class="links">
+                    还没有账号？ (Don't have an account?) <br>
+                    <a href="{{ url_for('auth.register') }}" style="display: inline-block; margin-top: 10px; font-size: 1.1em;">注册新账号 (Register Now)</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-image right"></div>
+    </div>
+</body>
+</html>

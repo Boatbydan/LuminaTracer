@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>设备校准 - Lumina Tracer</title>
+    <link rel="icon" href="data:,">
+    <style>
+        /* --- 全局样式 --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* --- 头部样式 --- */
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #fff 0%, #007bff 100%);
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 10px rgba(0,123,255,0.5);
+        }
+
+        .logo-text {
+            font-size: 1.2em;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text span {
+            color: #007bff;
+        }
+
+        /* --- 校准卡片 --- */
+        .calibration-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            color: #2c3e50;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+
+        /* --- 表单元素 --- */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            background: #0069d9;
+            transform: scale(1.1);
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #e7f3ff;
+            color: #007bff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+            margin-left: 10px;
+        }
+
+        .distance-guide {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            margin-top: 15px;
+        }
+
+        .distance-guide h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        /* --- 亮度校准区域 --- */
+        .brightness-calibration {
+            margin-top: 30px;
+        }
+
+        .test-area {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-pattern {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .instruction {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        /* --- 按钮样式 --- */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0069d9;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        /* --- 导航链接 --- */
+        .nav-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">LUMINA <span>TRACER</span></div>
+            </div>
+            <h1>设备校准 / Device Calibration</h1>
+            <p>调整距离和亮度设置，确保测试结果的准确性 / Adjust distance and brightness settings to ensure accurate test results</p>
+        </div>
+
+        <div class="calibration-card">
+            <h2 class="card-title">1. 距离校准 / Distance Calibration</h2>
+            
+            <div class="form-group">
+                <label class="form-label">请输入您距离屏幕的距离（厘米） / Enter your distance from the screen (centimeters)</label>
+                <div>
+                    <input type="range" id="distanceSlider" class="slider" min="20" max="100" value="30" step="1">
+                    <span class="slider-value" id="distanceValue">30 cm</span>
+                </div>
+                
+                <div class="distance-guide">
+                    <h4>距离参考 / Distance Reference</h4>
+                    <ul>
+                        <li>最佳距离：<span id="optimalDistance">30</span>厘米（基于屏幕尺寸计算） / Optimal distance: <span id="optimalDistance">30</span> cm (based on screen size)</li>
+                        <li>标准距离：30厘米（推荐） / Standard distance: 30 cm (Recommended)</li>
+                        <li>舒适距离：40-50厘米 / Comfortable distance: 40-50 cm</li>
+                        <li>最大距离：不超过100厘米 / Maximum distance: No more than 100 cm</li>
+                    </ul>
+                    <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107; font-size: 0.9em;">
+                        <strong>TODO：</strong> 后续将实现更精确的视野边界校准功能，包括视觉辅助工具和实时视角调整。
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="card-title brightness-calibration">2. 亮度校准 / Brightness Calibration</h2>
+            
+            <div class="instruction">
+                <h4>校准步骤 / Calibration Steps</h4>
+                <ol>
+                    <li>调整您的屏幕亮度至舒适水平 / Adjust your screen brightness to a comfortable level</li>
+                    <li>确保测试环境光线适中，避免阳光直射 / Ensure moderate lighting in the test environment, avoid direct sunlight</li>
+                    <li>观察下方测试区域，确保白色圆点清晰可见 / Observe the test area below to ensure the white dot is clearly visible</li>
+                </ol>
+            </div>
+
+            <div class="test-area" id="testArea">
+                <div class="test-pattern" id="testPattern"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">调整测试点亮度 / Adjust Test Point Brightness</label>
+                <div>
+                    <input type="range" id="brightnessSlider" class="slider" min="10" max="100" value="50" step="5">
+                    <span class="slider-value" id="brightnessValue">50%</span>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="resetCalibration()">重置为默认值 / Reset to Default</button>
+                <button class="btn btn-primary" onclick="saveCalibration()">保存校准设置 / Save Calibration</button>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('views.user_dashboard') }}" style="display: inline-block; margin: 0 auto; text-align: center; background: #007bff; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,123,255,0.2);">
+                返回用户中心 / Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 距离滑块处理
+        const distanceSlider = document.getElementById('distanceSlider');
+        const distanceValue = document.getElementById('distanceValue');
+        
+        distanceSlider.addEventListener('input', function() {
+            distanceValue.textContent = this.value + ' cm';
+        });
+
+        // 亮度滑块处理
+        const brightnessSlider = document.getElementById('brightnessSlider');
+        const brightnessValue = document.getElementById('brightnessValue');
+        const testPattern = document.getElementById('testPattern');
+        
+        brightnessSlider.addEventListener('input', function() {
+            const value = this.value;
+            brightnessValue.textContent = value + '%';
+            testPattern.style.opacity = value / 100;
+        });
+
+        // 重置校准
+        function resetCalibration() {
+            distanceSlider.value = 30;
+            distanceValue.textContent = '30 cm';
+            
+            brightnessSlider.value = 50;
+            brightnessValue.textContent = '50%';
+            testPattern.style.opacity = 0.5;
+        }
+
+        // 保存校准
+        function saveCalibration() {
+            const distance = distanceSlider.value;
+            const brightness = brightnessSlider.value;
+            
+            // 保存到本地存储
+            localStorage.setItem('calibration_distance', distance);
+            localStorage.setItem('calibration_brightness', brightness);
+            
+            // 显示保存成功消息
+            alert('校准设置已保存！');
+        }
+
+        // 加载保存的设置
+        function loadSavedSettings() {
+            const savedDistance = localStorage.getItem('calibration_distance');
+            const savedBrightness = localStorage.getItem('calibration_brightness');
+            
+            if (savedDistance) {
+                distanceSlider.value = savedDistance;
+                distanceValue.textContent = savedDistance + ' cm';
+            }
+            
+            if (savedBrightness) {
+                brightnessSlider.value = savedBrightness;
+                brightnessValue.textContent = savedBrightness + '%';
+                testPattern.style.opacity = savedBrightness / 100;
+            }
+        }
+
+        // 获取屏幕高度（像素）
+        function getScreenHeight() {
+            // 使用window.innerHeight，这是当前视口高度，最可靠
+            return window.innerHeight;
+        }
+
+        // 计算最佳距离（60度总视角，上下各30度）
+        function calculateOptimalDistance() {
+            const screenHeight = getScreenHeight();
+            // 像素转英寸（1英寸=96像素）
+            const heightInInches = screenHeight / 96;
+            // 英寸转厘米（1英寸=2.54厘米）
+            const heightInCm = heightInInches * 2.54;
+            // 计算60度视角对应的最佳距离（cm）
+            const optimalDistance = heightInCm / (2 * Math.tan(Math.PI / 6)); // Math.PI/6 = 30度
+            // 限制最大距离，确保合理
+            const maxDistance = 100; // 最大100厘米
+            const finalDistance = Math.min(Math.round(optimalDistance), maxDistance);
+            return finalDistance;
+        }
+
+        // 页面加载时加载保存的设置
+        window.onload = function() {
+            // 计算并设置最佳距离
+            const optimalDistance = calculateOptimalDistance();
+            // 更新最佳距离显示
+            const optimalDistanceElements = document.querySelectorAll('#optimalDistance');
+            optimalDistanceElements.forEach(element => {
+                element.textContent = optimalDistance;
+            });
+            // 设置滑块默认值为最佳距离
+            document.getElementById('distanceSlider').value = optimalDistance;
+            document.getElementById('distanceValue').textContent = optimalDistance + ' cm';
+            loadSavedSettings();
+        };
+    </script>
+</body>
+</html>

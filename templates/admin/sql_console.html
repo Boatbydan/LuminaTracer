@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SQL Console</title>
+    <link rel="icon" href="data:,">
+</head>
+<body style="padding: 20px; font-family: monospace;">
+    <h2>SQL 执行控制台</h2>
+    <a href="/admin">返回</a>
+    
+    <form method="POST" style="margin-top: 20px;">
+        <textarea name="query" rows="5" style="width: 100%; font-family: monospace; font-size: 1.1em;" placeholder="SELECT * FROM test_records WHERE session_id = '...'"></textarea>
+        <br><br>
+        <button type="submit" style="padding: 10px 20px;">执行 SQL</button>
+    </form>
+
+    {% if error %}
+        <div style="color: red; border: 1px solid red; padding: 10px; margin-top: 20px;">
+            错误: {{ error }}
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <div style="margin-top: 20px;">
+            {% if result is string %}
+                <div style="color: green;">{{ result }}</div>
+            {% else %}
+                <table border="1" style="border-collapse: collapse; width: 100%;">
+                    <tr>
+                        {% for col in columns %}<th>{{ col }}</th>{% endfor %}
+                    </tr>
+                    {% for row in result %}
+                    <tr>
+                        {% for col in columns %}<td>{{ row[col] }}</td>{% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>

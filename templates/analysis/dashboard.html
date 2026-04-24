@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>数据分析仪表盘</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 40px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { border-bottom: 2px solid #007bff; padding-bottom: 15px; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; color: #555; }
+        tr:hover { background-color: #f1f1f1; }
+        .btn { display: inline-block; padding: 6px 12px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
+        .btn:hover { background: #0056b3; }
+        .miss-badge { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+        .empty-state { text-align: center; color: #999; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>测试历史档案</h1>
+        
+        {% if reports %}
+        <table>
+            <thead>
+                <tr>
+                    <th>测试时间</th>
+                    <th>Session ID (后4位)</th>
+                    <th>测试点数</th>
+                    <th>漏看数 (Miss)</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in reports %}
+                <tr>
+                    <td>{{ row['created_at'] }}</td>
+                    <td>...{{ row['session_id'][-4:] }}</td>
+                    <td>{{ row['total'] }}</td>
+                    <td>
+                        {% if row['misses'] > 0 %}
+                            <span class="miss-badge">{{ row['misses'] }} Miss</span>
+                        {% else %}
+                            <span style="color:#28a745">0</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/analysis/report/{{ row['session_id'] }}" class="btn">查看详细报告</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty-state">
+                <p>暂无测试记录</p>
+                <a href="/" class="btn">开始第一次测试</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

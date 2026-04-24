@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Preparation - Confirm Environment</title>
+    <link rel="icon" href="data:">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; color: #333; padding: 40px; border-radius: 10px; width: 600px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        h1 { color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .h1-en { font-size: 0.8em; opacity: 0.7; margin-top: 5px; }
+        .alert-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left; border: 1px solid #ffeeba; }
+        .config-confirm { background: #e8f4ff; color: #0056b3; padding: 15px; border-radius: 5px; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; }
+        .config-confirm-en { font-size: 0.8em; opacity: 0.7; margin-top: 5px; }
+        ul { text-align: left; margin: 20px 0; padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        .li-en { font-size: 0.8em; opacity: 0.7; margin-top: 2px; }
+        .btn-start { display: block; width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 20px; cursor: pointer; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .btn-start:hover { background: #218838; transform: translateY(-2px); }
+        .btn-back { display: inline-block; margin-top: 20px; color: #666; text-decoration: none; font-size: 0.9em; }
+        .btn-back-en { display: block; font-size: 0.8em; opacity: 0.7; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>准备开始测试
+            <div class="h1-en">Prepare to Start Test</div>
+        </h1>
+
+        <div class="config-confirm">
+            <span>当前受测者：{{ user.name }}</span><br>
+            <div class="config-confirm-en">Current Subject: {{ user.name }}</div>
+            <span style="font-size: 1.2em; color: #d63384;">
+                即将测试：
+                {{ '左眼 (OS)' if config.eye == 'L' else '右眼 (OD)' }}
+            </span>
+            <!-- <div class="config-confirm-en">
+                Testing: 
+                {{ 'Left Eye (OS)' if config.eye == 'L' else 'Right Eye (OD)' }}
+            </div> -->
+            <br>
+            <span style="font-size: 0.8em; opacity: 0.8;">模式: {{ config.mode }}</span>
+        </div>
+        
+        <div class="alert-box">
+            <strong>⚠️ 请确认以下环境要求已满足：</strong>
+            <div class="li-en"><strong>⚠️ Please confirm the following environmental requirements are met:</strong></div>
+            <ul>
+                <li>
+                    请遮挡住您的 <strong>{{ '右眼' if config.eye == 'L' else '左眼' }}</strong>。
+                    <div class="li-en">Please cover your <strong>{{ 'right eye' if config.eye == 'L' else 'left eye' }}</strong>.</div>
+                </li>
+                <li>
+                    环境光线已调暗，避免屏幕反光。
+                    <div class="li-en">The environment is dimly lit to avoid screen glare.</div>
+                </li>
+                <li>
+                    头部保持固定，眼睛距离屏幕约 50-60 厘米。
+                    <div class="li-en">Keep your head still, eyes approximately 50-60 cm from the screen.</div>
+                </li>
+                <li>
+                    测试全程请<strong>注视屏幕中央红圈</strong>，不要转动眼球去追光点。
+                    <div class="li-en">During the entire test, please <strong>fixate on the red circle in the center of the screen</strong> and do not move your eyes to chase the light spots.</div>
+                </li>
+            </ul>
+        </div>
+
+        <a href="/test" class="btn-start">我已准备好，立即开始</a>
+        
+        <a href="/dashboard" class="btn-back">
+            返回重新设置
+            <div class="btn-back-en">Back to Reset</div>
+        </a>
+    </div>
+</body>
+</html>

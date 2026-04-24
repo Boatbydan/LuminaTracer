@@ -1,0 +1,37 @@
+body {
+    margin: 0;
+    background-color: black; /* 医疗标准：低光环境 */
+    color: #888;
+    overflow: hidden; /* 禁止滚动条 */
+    font-family: 'Segoe UI', sans-serif;
+    user-select: none; /* 禁止选中文本 */
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;           /* 改为 0 覆盖全屏 */
+    left: 0;
+    width: 100%;
+    height: 100%;     /* 覆盖全屏 */
+    text-align: center;
+    z-index: 100;
+    pointer-events: none; /* 默认：让点击穿透，不影响测试按空格 */
+}
+
+#fixation-target {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ff3333; /* 红色固视圈 */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #ff3333;
+    z-index: 50;
+}
+
+canvas {
+    display: block;
+    z-index: 1;
+}
