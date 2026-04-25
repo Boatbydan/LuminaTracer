@@ -20,9 +20,6 @@
 * 基于现代电子设备的视野测试
 * 基于过去测试记录的参考测试
 
-### 🎯 视野测试 (Perimetry)
-* **24-2 标准测试模式**: 包含 54 个标准测试点，覆盖中心 24 度视野及鼻侧阶梯 (Nasal Step)。
-
 ### 📊 报告与分析 (Analysis)
 * **可视化报告**: 自动生成敏感度数值图 (Sensitivity Map) 与灰度图 (Grayscale Map)。
 
@@ -35,9 +32,9 @@
 
 ### 📥 立即使用 (推荐)
 
-无需安装任何代码环境，可直接下载 Windows 绿色版：
+无需安装任何代码环境，可直接下载绿色版，免安装，开箱即用：
 
-1.  **下载**: 前往 [Releases 页面](https://github.com/Boatbydan/LuminaTracer/releases) 下载 `LuminaTracer_v1.0.zip`。
+1.  **下载**: 前往 [Releases 页面](https://github.com/Boatbydan/LuminaTracer/releases) 下载对应平台的 `LuminaTracer.zip`。
 2.  **运行**: 解压后双击 **`LuminaTracer.exe`** 即可启动。
 
 ### 📥 编译运行

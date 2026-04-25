@@ -20,9 +20,6 @@ Currently, it should be able to intuitively reflect whether there are visual fun
 * Visual field testing based on modern electronic devices
 * Reference testing based on past test records
 
-### 🎯 Perimetry
-* **24-2 Standard Test Mode**: Contains 54 standard test points, covering the central 24-degree visual field and nasal step.
-
 ### 📊 Analysis & Reporting
 * **Visual Reports**: Automatically generates sensitivity numerical maps (Sensitivity Map) and grayscale maps (Grayscale Map).
 
@@ -35,10 +32,10 @@ Currently, it should be able to intuitively reflect whether there are visual fun
 
 ### 📥 Ready to Use (Recommended)
 
-No need to install any code environment, you can directly download the Windows portable version:
+No need to install any code environment, you can directly download the portable version, no installation required, out of the box:
 
-1. **Download**: Go to the [Releases page](https://github.com/Boatbydan/LuminaTracer/releases) to download `LuminaTracer_v1.0.zip`.
-2. **Run**: Extract the files and double-click **`LuminaTracer.exe`** to start.
+1. **Download**: Go to the [Releases page](https://github.com/Boatbydan/LuminaTracer/releases) to download `LuminaTracer.zip` for your platform.
+2. **Run**: Extract the files and run **`LuminaTracer.exe`** to start.
 
 ### 📥 Compile and Run
 #### 1. Environment Preparation
