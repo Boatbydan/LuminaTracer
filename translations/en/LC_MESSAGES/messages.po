@@ -1,0 +1,1071 @@
+# English translations for Lumina Tracer
+# Copyright (C) 2026 Lumina Tracer Project
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lumina Tracer 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-25 21:47+0800\n"
+"PO-Revision-Date: 2026-05-25 00:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/modules/vision/routes.py:114 app/modules/vision/routes.py:138
+msgid "无效的测试记录"
+msgstr "Invalid test record"
+
+#: app/modules/vision/routes.py:265
+msgid "记录删除成功"
+msgstr "Record deleted successfully"
+
+#: app/modules/vision/routes.py:268
+msgid "删除失败"
+msgstr "Delete failed"
+
+#: app/modules/vision/routes.py:270
+msgid "记录不存在或无权限"
+msgstr "Record not found or unauthorized"
+
+#: app/routes/auth.py:24
+msgid "邮箱或密码错误"
+msgstr "Invalid email or password"
+
+#: app/routes/auth.py:41
+msgid "该邮箱已被注册"
+msgstr "This email is already registered"
+
+#: app/routes/auth.py:50
+msgid "注册成功，请登录"
+msgstr "Registration successful, please sign in"
+
+#: app/routes/hub.py:106
+#, python-format
+msgid "主题已更改: %(theme)s"
+msgstr "Theme changed to: %(theme)s"
+
+#: app/routes/hub.py:115
+msgid "视野测试默认参数已保存"
+msgstr "Vision test defaults saved successfully"
+
+#: app/routes/hub.py:118
+msgid "未知的操作"
+msgstr "Unknown action"
+
+#: app/routes/hub.py:152
+msgid "缺少必要参数"
+msgstr "Missing required parameters"
+
+#: app/routes/hub.py:167
+msgid "设置已保存"
+msgstr "Settings saved"
+
+#: app/routes/auth.py:72
+msgid "不支持的语言代码"
+msgstr "Unsupported language code"
+
+#: templates/_footer.html:15
+msgid "GitHub 仓库"
+msgstr "GitHub Repository"
+
+#: templates/_footer.html:16
+msgid "GitHub"
+msgstr "GitHub"
+
+#: templates/_footer.html:19
+msgid "给个 Star 支持项目发展"
+msgstr "Star this project to support development"
+
+#: templates/_footer.html:20
+msgid "Star"
+msgstr "Star"
+
+#: templates/_footer.html:23
+msgid "反馈问题或建议"
+msgstr "Report issues or suggestions"
+
+#: templates/_footer.html:24
+msgid "反馈"
+msgstr "Feedback"
+
+#: templates/_footer.html:27
+msgid "检查更新"
+msgstr "Check for Updates"
+
+#: templates/_footer.html:28
+msgid "更新"
+msgstr "Update"
+
+#: templates/_footer.html:31
+msgid "使用教程"
+msgstr "User Guide"
+
+#: templates/_footer.html:32
+msgid "教程"
+msgstr "Tutorial"
+
+#: templates/_navbar.html:10
+msgid "切换导航"
+msgstr "Toggle Navigation"
+
+#: templates/_navbar.html:19 templates/hub/dashboard.html:6
+msgid "控制台"
+msgstr "Dashboard"
+
+#: templates/_navbar.html:25
+msgid "视野测试"
+msgstr "Vision Test"
+
+#: templates/_navbar.html:31 templates/modules/vision/calibration.html:5
+#: templates/modules/vision/dashboard.html:191
+msgid "设备校准"
+msgstr "Device Calibration"
+
+#: templates/_navbar.html:39
+msgid "切换主题"
+msgstr "Toggle Theme"
+
+#: templates/_navbar.html:45 templates/hub/settings.html:6
+#: templates/hub/settings.html:39
+msgid "设置"
+msgstr "Settings"
+
+#: templates/_navbar.html:58
+msgid "个人设置"
+msgstr "Profile"
+
+#: templates/_navbar.html:62
+msgid "退出登录"
+msgstr "Sign Out"
+
+#: templates/_navbar.html:42
+msgid "切换语言"
+msgstr "Switch Language"
+
+#: templates/auth/login.html:6 templates/auth/login.html:124
+#: templates/setup.html:3
+msgid "登录"
+msgstr "Sign In"
+
+#: templates/setup.html:18
+msgid "用户登录"
+msgstr "User Login"
+
+#: templates/setup.html:19
+msgid "选择档案"
+msgstr "Select Profile"
+
+#: templates/setup.html:22
+msgid "岁"
+msgstr " years old"
+
+#: templates/setup.html:25
+msgid "进入系统"
+msgstr "Enter System"
+
+#: templates/setup.html:29
+msgid "新用户注册"
+msgstr "New User Registration"
+
+#: templates/modules/vision/report.html:179 templates/setup.html:30
+msgid "姓名"
+msgstr "Full Name"
+
+#: templates/auth/register.html:119 templates/hub/settings.html:204
+#: templates/setup.html:31
+msgid "年龄"
+msgstr "Age"
+
+#: templates/auth/register.html:123 templates/hub/settings.html:208
+#: templates/setup.html:32
+msgid "性别"
+msgstr "Gender"
+
+#: templates/auth/register.html:125 templates/hub/settings.html:209
+#: templates/setup.html:34
+msgid "男"
+msgstr "Male"
+
+#: templates/auth/register.html:126 templates/hub/settings.html:209
+#: templates/setup.html:35
+msgid "女"
+msgstr "Female"
+
+#: templates/setup.html:37
+msgid "创建并登录"
+msgstr "Create & Sign In"
+
+#: templates/admin/dashboard.html:3
+msgid "后台管理系统"
+msgstr "Admin Management System"
+
+#: templates/admin/dashboard.html:14
+msgid "数据库管理控制台"
+msgstr "Database Management Console"
+
+#: templates/admin/dashboard.html:17
+msgid "进入 SQL 控制台"
+msgstr "Enter SQL Console"
+
+#: templates/admin/dashboard.html:18
+msgid "返回前台"
+msgstr "Return to Frontend"
+
+#: templates/admin/dashboard.html:21
+msgid "数据表列表:"
+msgstr "Data Tables:"
+
+#: templates/admin/sql_console.html:3
+msgid "SQL 控制台"
+msgstr "SQL Console"
+
+#: templates/admin/sql_console.html:7
+msgid "SQL 执行控制台"
+msgstr "SQL Execution Console"
+
+#: templates/admin/sql_console.html:8
+#: templates/modules/vision/prepare_incremental.html:78
+msgid "返回"
+msgstr "Back"
+
+#: templates/admin/sql_console.html:13
+msgid "执行 SQL"
+msgstr "Execute SQL"
+
+#: templates/admin/sql_console.html:18
+msgid "错误:"
+msgstr "Error:"
+
+#: templates/admin/table_view.html:3
+msgid "查看表:"
+msgstr "View Table:"
+
+#: templates/admin/table_view.html:16
+msgid "表:"
+msgstr "Table:"
+
+#: templates/admin/table_view.html:17
+msgid "返回仪表盘"
+msgstr "Back to Dashboard"
+
+#: templates/analysis/dashboard.html:3
+msgid "数据分析仪表盘"
+msgstr "Data Analysis Dashboard"
+
+#: templates/analysis/dashboard.html:21
+msgid "测试历史档案"
+msgstr "Test History Archive"
+
+#: templates/analysis/dashboard.html:27
+msgid "测试时间"
+msgstr "Test Time"
+
+#: templates/analysis/dashboard.html:28
+msgid "Session ID (后4位)"
+msgstr "Session ID (Last 4)"
+
+#: templates/analysis/dashboard.html:29
+msgid "测试点数"
+msgstr "Test Points"
+
+#: templates/analysis/dashboard.html:30
+msgid "漏看数 (Miss)"
+msgstr "Missed Points"
+
+#: templates/analysis/dashboard.html:31
+#: templates/modules/vision/dashboard.html:255
+msgid "操作"
+msgstr "Actions"
+
+#: templates/analysis/dashboard.html:48
+msgid "查看详细报告"
+msgstr "View Detailed Report"
+
+#: templates/analysis/dashboard.html:56 templates/hub/dashboard.html:175
+msgid "暂无测试记录"
+msgstr "No test records yet"
+
+#: templates/analysis/dashboard.html:57
+msgid "开始第一次测试"
+msgstr "Start your first test"
+
+#: templates/analysis/report.html:4 templates/modules/vision/report.html:5
+msgid "Lumina Tracer 报告"
+msgstr "Lumina Tracer Report"
+
+#: templates/auth/login.html:117
+msgid "邮箱地址"
+msgstr "Email Address"
+
+#: templates/auth/login.html:121
+msgid "密码"
+msgstr "Password"
+
+#: templates/auth/login.html:128
+msgid "还没有账号？"
+msgstr "Don't have an account?"
+
+#: templates/auth/login.html:129
+msgid "注册新账号"
+msgstr "Create New Account"
+
+#: templates/auth/register.html:6
+msgid "注册"
+msgstr "Register"
+
+#: templates/auth/register.html:96
+msgid "创建新账号"
+msgstr "Create New Account"
+
+#: templates/auth/register.html:108
+msgid "登录邮箱"
+msgstr "Email Address"
+
+#: templates/auth/register.html:113
+msgid "真实姓名"
+msgstr "Full Name"
+
+#: templates/auth/register.html:127
+msgid "其他"
+msgstr "Other"
+
+#: templates/auth/register.html:133
+msgid "设置密码"
+msgstr "Set Password"
+
+#: templates/auth/register.html:137
+msgid "立即注册"
+msgstr "Register Now"
+
+#: templates/auth/register.html:141
+msgid "已有账号？"
+msgstr "Already have an account?"
+
+#: templates/auth/register.html:142
+msgid "返回登录"
+msgstr "Back to Sign In"
+
+#: templates/hub/dashboard.html:33
+#, python-format
+msgid "欢迎回来，%(name)s"
+msgstr "Welcome back, %(name)s"
+
+#: templates/hub/dashboard.html:34
+msgid "选择测试模块开始，或查看最近的测试记录"
+msgstr "Select a test module to begin, or view your recent test history"
+
+#: templates/hub/dashboard.html:46
+msgid "总测试次数"
+msgstr "Total Tests"
+
+#: templates/hub/dashboard.html:59
+msgid "已完成测试"
+msgstr "Completed Tests"
+
+#: templates/hub/dashboard.html:72
+msgid "可用模块"
+msgstr "Available Modules"
+
+#: templates/hub/dashboard.html:83
+msgid "测试模块"
+msgstr "Test Module"
+
+#: templates/hub/dashboard.html:105
+msgid "进入测试"
+msgstr "Enter Test"
+
+#: templates/hub/dashboard.html:120
+msgid "更多模块即将推出"
+msgstr "More modules coming soon"
+
+#: templates/hub/dashboard.html:121
+msgid "视力检查、色觉测试..."
+msgstr "Visual acuity, color vision tests..."
+
+#: templates/hub/dashboard.html:131
+msgid "最近活动"
+msgstr "Recent Activity"
+
+#: templates/hub/dashboard.html:134
+msgid "查看全部"
+msgstr "View All"
+
+#: templates/hub/dashboard.html:150
+msgid "参考"
+msgstr "Reference"
+
+#: templates/hub/dashboard.html:155
+msgid "点"
+msgstr "pts"
+
+#: templates/hub/dashboard.html:163
+msgid "完成"
+msgstr "Complete"
+
+#: templates/hub/dashboard.html:165
+msgid "未完成"
+msgstr "Incomplete"
+
+#: templates/hub/dashboard.html:176
+msgid "开始你的第一次测试吧"
+msgstr "Start your first test now"
+
+#: templates/hub/settings.html:40
+msgid "管理你的偏好和测试参数"
+msgstr "Manage your preferences and test parameters"
+
+#: templates/hub/settings.html:58
+msgid "主题模式"
+msgstr "Theme Mode"
+
+#: templates/hub/settings.html:70
+msgid "浅色模式"
+msgstr "Light Mode"
+
+#: templates/hub/settings.html:85
+msgid "深色模式"
+msgstr "Dark Mode"
+
+#: templates/hub/settings.html:100
+msgid "跟随系统"
+msgstr "Follow System"
+
+#: templates/hub/settings.html:108
+msgid "保存主题设置"
+msgstr "Save Theme Settings"
+
+#: templates/hub/settings.html:135
+msgid "视野测试默认偏好"
+msgstr "Vision Test Defaults"
+
+#: templates/hub/settings.html:143
+msgid "以下设置仅作为进入测试页面的初始建议值，每次开始测试前你仍需确认实际选择。"
+msgstr "These settings are only initial suggestions when entering the test page. You still need to confirm your actual selection before each test."
+
+#: templates/hub/settings.html:147
+msgid "偏好眼别"
+msgstr "Preferred Eye"
+
+#: templates/hub/settings.html:150
+msgid "双眼 (OS/OU)"
+msgstr "Both Eyes (OS/OU)"
+
+#: templates/hub/settings.html:153
+#: templates/modules/vision/prepare_incremental.html:72
+msgid "左眼 (OS)"
+msgstr "Left Eye (OS)"
+
+#: templates/hub/settings.html:156
+#: templates/modules/vision/prepare_incremental.html:73
+msgid "右眼 (OD)"
+msgstr "Right Eye (OD)"
+
+#: templates/hub/settings.html:159
+msgid "测试页面将以此作为初始选项，你可随时修改"
+msgstr "The test page will use this as the initial option. You can modify it at any time."
+
+#: templates/hub/settings.html:163
+msgid "默认测试模式"
+msgstr "Default Test Mode"
+
+#: templates/hub/settings.html:172
+msgid "首次进入视野测试时自动选择的模式"
+msgstr "Mode automatically selected when entering vision test for the first time"
+
+#: templates/hub/settings.html:176
+msgid "保存参数设置"
+msgstr "Save Parameter Settings"
+
+#: templates/hub/settings.html:200
+msgid "注册时间"
+msgstr "Registration Date"
+
+#: templates/hub/settings.html:205 templates/hub/settings.html:209
+msgid "未设置"
+msgstr "Not Set"
+
+#: templates/hub/settings.html:219
+msgid "提示"
+msgstr "Tips"
+
+#: templates/hub/settings.html:222
+msgid "主题设置会立即生效并保存到你的账户"
+msgstr "Theme settings take effect immediately and are saved to your account"
+
+#: templates/hub/settings.html:223
+msgid "初始偏好仅作为测试页面的建议值，每次测试前需确认选择"
+msgstr "Initial preferences are only suggestions for the test page. Confirm selection before each test"
+
+#: templates/hub/settings.html:231
+msgid "返回控制台"
+msgstr "Back to Dashboard"
+
+#: templates/modules/vision/calibration.html:89
+msgid "1. 距离校准"
+msgstr "1. Distance Calibration"
+
+#: templates/modules/vision/calibration.html:92
+msgid "请输入您距离屏幕的距离（厘米）"
+msgstr "Please enter your distance from the screen (cm)"
+
+#: templates/modules/vision/calibration.html:99
+msgid "距离参考"
+msgstr "Distance Reference"
+
+#: templates/modules/vision/calibration.html:101
+msgid "最佳距离："
+msgstr "Optimal distance: "
+
+#: templates/modules/vision/calibration.html:101
+msgid "厘米（基于屏幕尺寸计算）"
+msgstr " cm (calculated based on screen size)"
+
+#: templates/modules/vision/calibration.html:102
+msgid "标准距离：30厘米（推荐）"
+msgstr "Standard distance: 30 cm (recommended)"
+
+#: templates/modules/vision/calibration.html:103
+msgid "舒适距离：40-50厘米"
+msgstr "Comfortable distance: 40-50 cm"
+
+#: templates/modules/vision/calibration.html:104
+msgid "最大距离：不超过100厘米"
+msgstr "Maximum distance: not exceeding 100 cm"
+
+#: templates/modules/vision/calibration.html:107
+msgid "后续将实现更精确的视野边界校准功能，包括视觉辅助工具和实时视角调整。"
+msgstr "More precise visual field boundary calibration will be implemented in the future, including visual aids and real-time angle adjustment."
+
+#: templates/modules/vision/calibration.html:112
+msgid "2. 亮度校准"
+msgstr "2. Brightness Calibration"
+
+#: templates/modules/vision/calibration.html:115
+msgid "校准步骤"
+msgstr "Calibration Steps"
+
+#: templates/modules/vision/calibration.html:117
+msgid "调整您的屏幕亮度至舒适水平"
+msgstr "Adjust your screen brightness to a comfortable level"
+
+#: templates/modules/vision/calibration.html:118
+msgid "确保测试环境光线适中，避免阳光直射"
+msgstr "Ensure moderate lighting in the test environment, avoid direct sunlight"
+
+#: templates/modules/vision/calibration.html:119
+msgid "观察下方测试区域，确保白色圆点清晰可见"
+msgstr "Observe the test area below and ensure the white dot is clearly visible"
+
+#: templates/modules/vision/calibration.html:128
+msgid "调整测试点亮度"
+msgstr "Adjust Test Point Brightness"
+
+#: templates/modules/vision/calibration.html:136
+msgid "重置为默认值"
+msgstr "Reset to Default"
+
+#: templates/modules/vision/calibration.html:137
+msgid "保存校准设置"
+msgstr "Save Calibration Settings"
+
+#: templates/modules/vision/calibration.html:175
+msgid "校准设置已保存！"
+msgstr "Calibration settings saved!"
+
+#: templates/modules/vision/dashboard.html:187
+msgid "新建测试"
+msgstr "New Test"
+
+#: templates/modules/vision/dashboard.html:192
+msgid "调整距离和亮度设置，确保测试结果的准确性"
+msgstr "Adjust distance and brightness settings to ensure accurate test results"
+
+#: templates/modules/vision/dashboard.html:194
+msgid "前往校准"
+msgstr "Go to Calibration"
+
+#: templates/modules/vision/dashboard.html:200
+#: templates/modules/vision/dashboard.html:252
+msgid "眼别"
+msgstr "Eye"
+
+#: templates/modules/vision/dashboard.html:206
+#: templates/modules/vision/landing.html:171
+#: templates/modules/vision/landing.html:196
+#: templates/modules/vision/prepare_incremental.html:63
+msgid "左眼"
+msgstr "Left Eye"
+
+#: templates/modules/vision/dashboard.html:214
+#: templates/modules/vision/landing.html:171
+#: templates/modules/vision/landing.html:196
+#: templates/modules/vision/prepare_incremental.html:63
+msgid "右眼"
+msgstr "Right Eye"
+
+#: templates/modules/vision/dashboard.html:221
+msgid "测试策略"
+msgstr "Test Strategy"
+
+#: templates/modules/vision/dashboard.html:230
+msgid "加载描述中..."
+msgstr "Loading description..."
+
+#: templates/modules/vision/dashboard.html:235
+#: templates/modules/vision/prepare_incremental.html:79
+msgid "开始测试"
+msgstr "Start Test"
+
+#: templates/modules/vision/dashboard.html:239
+#: templates/modules/vision/prepare_incremental.html:6
+#: templates/modules/vision/prepare_incremental.html:53
+#: templates/modules/vision/report.html:191
+#: templates/modules/vision/report.html:193
+msgid "参考测试"
+msgstr "Reference Test"
+
+#: templates/modules/vision/dashboard.html:245
+msgid "测试历史"
+msgstr "Test History"
+
+#: templates/modules/vision/dashboard.html:251
+msgid "日期"
+msgstr "Date"
+
+#: templates/modules/vision/dashboard.html:253
+#: templates/modules/vision/report.html:186
+msgid "策略"
+msgstr "Strategy"
+
+#: templates/modules/vision/dashboard.html:254
+msgid "详情"
+msgstr "Details"
+
+#: templates/modules/vision/dashboard.html:278
+msgid "报告"
+msgstr "Report"
+
+#: templates/modules/vision/dashboard.html:280
+msgid "确定要删除此记录吗？此操作不可撤销。"
+msgstr "Are you sure you want to delete this record? This action cannot be undone."
+
+#: templates/modules/vision/dashboard.html:281
+msgid "删除"
+msgstr "Delete"
+
+#: templates/modules/vision/dashboard.html:290
+msgid "暂无记录，请开始您的第一次测试。"
+msgstr "No records yet. Please start your first test."
+
+#: templates/modules/vision/dashboard.html:312
+msgid "暂无描述"
+msgstr "No description available"
+
+#: templates/modules/vision/dashboard.html:314
+msgid "暂无可用模式"
+msgstr "No modes available"
+
+#: templates/modules/vision/landing.html:6
+msgid "测试准备 - 确认环境"
+msgstr "Test Preparation - Confirm Environment"
+
+#: templates/modules/vision/landing.html:167
+msgid "准备开始测试"
+msgstr "Prepare to Start Test"
+
+#: templates/modules/vision/landing.html:170
+msgid "当前受测者："
+msgstr "Current Subject: "
+
+#: templates/modules/vision/landing.html:171
+msgid "即将测试："
+msgstr "Testing: "
+
+#: templates/modules/vision/landing.html:172
+msgid "模式:"
+msgstr "Mode: "
+
+#: templates/modules/vision/landing.html:176
+msgid "响应方式"
+msgstr "Response Method"
+
+#: templates/modules/vision/landing.html:177
+msgid "看到光点时，使用以下任意方式响应："
+msgstr "When you see a light point, respond using any of the following methods:"
+
+#: templates/modules/vision/landing.html:179
+msgid "空格键"
+msgstr "Spacebar"
+
+#: templates/modules/vision/landing.html:180
+msgid "鼠标点击"
+msgstr "Mouse Click"
+
+#: templates/modules/vision/landing.html:181
+msgid "触屏点击"
+msgstr "Touch Screen Tap"
+
+#: templates/modules/vision/landing.html:188
+msgid "全屏模式"
+msgstr "Fullscreen Mode"
+
+#: templates/modules/vision/landing.html:190
+msgid "推荐，减少干扰"
+msgstr "Recommended, reduces distractions"
+
+#: templates/modules/vision/landing.html:194
+msgid "请确认以下环境要求已满足："
+msgstr "Please confirm that the following environmental requirements are met:"
+
+#: templates/modules/vision/landing.html:196
+msgid "请遮挡住您的 "
+msgstr "Please cover your "
+
+#: templates/modules/vision/landing.html:197
+msgid "环境光线已调暗，避免屏幕反光。"
+msgstr "Ambient light has been dimmed to avoid screen glare."
+
+#: templates/modules/vision/landing.html:198
+msgid "头部保持固定，眼睛距离屏幕约 50-60 厘米。"
+msgstr "Keep your head stationary, eyes approximately 50-60 cm from the screen."
+
+#: templates/modules/vision/landing.html:199
+msgid "测试全程请"
+msgstr "During the entire test, please "
+
+#: templates/modules/vision/landing.html:199
+msgid "注视屏幕中央十字"
+msgstr "fixate on the central crosshair"
+
+#: templates/modules/vision/landing.html:199
+msgid "不要转动眼球去追光点。"
+msgstr "do not move your eyes to follow the light points."
+
+#: templates/modules/vision/landing.html:203
+msgid "我已准备好，立即开始"
+msgstr "I'm ready, start now"
+
+#: templates/modules/vision/landing.html:205
+msgid "返回重新设置"
+msgstr "Back to Reconfigure"
+
+#: templates/modules/vision/prepare_incremental.html:54
+msgid "选择之前的测试结果作为参考，只测试异常点位"
+msgstr "Select previous test results as reference, only test abnormal points"
+
+#: templates/modules/vision/prepare_incremental.html:58
+msgid "参考测试记录"
+msgstr "Reference Test Record"
+
+#: templates/modules/vision/prepare_incremental.html:60
+msgid "选择测试记录"
+msgstr "Select Test Record"
+
+#: templates/modules/vision/prepare_incremental.html:70
+msgid "测试眼别"
+msgstr "Test Eye"
+
+#: templates/modules/vision/report.html:178
+msgid "患者信息"
+msgstr "Patient Information"
+
+#: templates/modules/vision/report.html:180
+msgid "年龄 / 性别"
+msgstr "Age / Gender"
+
+#: templates/modules/vision/report.html:181
+msgid "患者ID"
+msgstr "Patient ID"
+
+#: templates/modules/vision/report.html:185
+msgid "测试参数"
+msgstr "Test Parameters"
+
+#: templates/modules/vision/report.html:186
+msgid "自适应贝叶斯"
+msgstr "Adaptive Bayesian"
+
+#: templates/modules/vision/report.html:187
+msgid "模式"
+msgstr "Mode"
+
+#: templates/modules/vision/report.html:187
+msgid "标准 24-2"
+msgstr "Standard 24-2"
+
+#: templates/modules/vision/report.html:188
+msgid "刺激"
+msgstr "Stimulus"
+
+#: templates/modules/vision/report.html:189
+msgid "背景"
+msgstr "Background"
+
+#: templates/modules/vision/report.html:191
+msgid "测试类型"
+msgstr "Test Type"
+
+#: templates/modules/vision/report.html:199
+msgid "可靠性指标"
+msgstr "Reliability Indices"
+
+#: templates/modules/vision/report.html:201
+msgid "固视丢失"
+msgstr "Fixation Loss"
+
+#: templates/modules/vision/report.html:207
+msgid "假阳性"
+msgstr "False Positives"
+
+#: templates/modules/vision/report.html:211
+msgid "时长"
+msgstr "Duration"
+
+#: templates/modules/vision/report.html:223
+msgid "左图:"
+msgstr "Left Map: "
+
+#: templates/modules/vision/report.html:223
+msgid "灵敏度值 (dB)"
+msgstr "Sensitivity (dB)"
+
+#: templates/modules/vision/report.html:224
+msgid "右图:"
+msgstr "Right Map: "
+
+#: templates/modules/vision/report.html:224
+msgid "插值灰度图"
+msgstr "Interpolated Grayscale Map"
+
+#: templates/modules/vision/report.html:228
+msgid "数据不足"
+msgstr "Insufficient Data"
+
+#: templates/modules/vision/report.html:229
+msgid "有效点位不足，无法生成视野地形图。"
+msgstr "Insufficient valid points to generate visual field map."
+
+#: templates/modules/vision/report.html:235
+msgid "LUMINA TRACER 系统 v1.0"
+msgstr "LUMINA TRACER System v1.0"
+
+#: templates/modules/vision/report.html:235
+msgid "视野计系统"
+msgstr "Perimeter System"
+
+#: templates/modules/vision/report.html:236
+msgid "基于薄板样条（TPS）插值和 ZEST 兼容逻辑的分析。"
+msgstr "Analysis based on Thin Plate Spline (TPS) interpolation and ZEST-compatible logic."
+
+#: templates/modules/vision/report.html:237
+msgid "本报告仅供参考，不能替代专业医疗诊断。"
+msgstr "This report is for reference only and cannot replace professional medical diagnosis."
+
+#: templates/modules/vision/report.html:242
+msgid "返回个人主页"
+msgstr "Back to Profile"
+
+#: templates/modules/vision/report.html:246
+msgid "开始参考测试"
+msgstr "Start Reference Test"
+
+#: templates/modules/vision/report.html:250
+msgid "打印报告"
+msgstr "Print Report"
+
+#: templates/modules/vision/report.html:254
+msgid "打开为 PDF (W)"
+msgstr "Open as PDF (W)"
+
+#: templates/modules/vision/report.html:267
+msgid "生成中..."
+msgstr "Generating..."
+
+#: templates/modules/vision/report.html:359
+msgid "PDF 已打开"
+msgstr "PDF Opened"
+
+#: templates/modules/vision/report.html:361
+msgid "系统查看器错误："
+msgstr "System Viewer Error: "
+
+#: templates/modules/vision/report.html:362
+msgid "错误"
+msgstr "Error"
+
+#: templates/modules/vision/report.html:373
+msgid "失败"
+msgstr "Failed"
+
+#: templates/modules/vision/report.html:374
+msgid "PDF 生成失败。"
+msgstr "PDF generation failed."
+
+#: templates/modules/vision/test.html:169
+msgid "点击任意位置开始测试"
+msgstr "Click anywhere to start the test"
+
+#: templates/modules/vision/test.html:170
+msgid "按空格键也可开始"
+msgstr "You can also press Spacebar to start"
+
+#: templates/modules/vision/test.html:176
+msgid "按 ESC 退出全屏"
+msgstr "Press ESC to exit fullscreen"
+
+#: templates/user_profile.html:5
+msgid "用户中心"
+msgstr "User Center"
+
+#: templates/user_profile.html:22
+msgid "欢迎，"
+msgstr "Welcome, "
+
+#: templates/user_profile.html:24
+msgid "岁"
+msgstr " years old"
+
+#: templates/user_profile.html:27
+msgid "退出登录"
+msgstr "Sign Out"
+
+#: templates/user_profile.html:38
+msgid "开始新的视野测试"
+msgstr "Start New Vision Test"
+
+#: templates/user_profile.html:43
+msgid "设备校准"
+msgstr "Device Calibration"
+
+#: templates/user_profile.html:44
+msgid "调整距离和亮度设置，确保测试结果的准确性"
+msgstr "Adjust distance and brightness settings to ensure accurate test results"
+
+#: templates/user_profile.html:48
+msgid "前往校准"
+msgstr "Go to Calibration"
+
+#: templates/user_profile.html:66
+msgid "选择眼别:"
+msgstr "Select Eye:"
+
+#: templates/user_profile.html:71
+msgid "左眼 (OS)"
+msgstr "Left Eye (OS)"
+
+#: templates/user_profile.html:77
+msgid "右眼 (OD)"
+msgstr "Right Eye (OD)"
+
+#: templates/user_profile.html:87
+msgid "测试策略:"
+msgstr "Test Strategy:"
+
+#: templates/user_profile.html:97
+msgid "加载策略描述中..."
+msgstr "Loading strategy description..."
+
+#: templates/user_profile.html:101
+msgid "开始测试"
+msgstr "Start Test"
+
+#: templates/user_profile.html:113
+msgid "历史记录"
+msgstr "History"
+
+#: templates/user_profile.html:115
+msgid "历史记录 (History)"
+msgstr "History"
+
+#: templates/user_profile.html:120
+msgid "日期"
+msgstr "Date"
+
+#: templates/user_profile.html:121
+msgid "眼别"
+msgstr "Eye"
+
+#: templates/user_profile.html:122
+msgid "模式"
+msgstr "Mode"
+
+#: templates/user_profile.html:123
+msgid "状态"
+msgstr "Status"
+
+#: templates/user_profile.html:124
+msgid "操作"
+msgstr "Actions"
+
+#: templates/user_profile.html:133
+msgid "左眼"
+msgstr "Left Eye"
+
+#: templates/user_profile.html:137
+msgid "右眼"
+msgstr "Right Eye"
+
+#: templates/user_profile.html:141
+msgid "完成"
+msgstr "Completed"
+
+#: templates/user_profile.html_145
+msgid "查看"
+msgstr "View"
+
+#: templates/user_profile.html_149
+msgid "确定要永久删除这条测试记录吗？此操作无法撤销。"
+msgstr "Are you sure you want to permanently delete this test record? This action cannot be undone."
+
+#: templates/user_profile.html_153
+msgid "删除"
+msgstr "Delete"
+
+#: templates/user_profile.html_158
+msgid "无效数据"
+msgstr "Invalid Data"
+
+#: templates/user_profile.html_169
+msgid "暂无记录，请点击上方"开始测试"。"
+msgstr "No records yet. Please click \"Start Test\" above."
+
+#: templates/user_profile.html_180
+msgid "系统管理区域"
+msgstr "System Management Area"
+
+#: templates/user_profile.html_182
+msgid "进入后台数据库管理系统"
+msgstr "Enter Backend Database Management System"
+
+#: templates/setup.html:3
+msgid "登录"
+msgstr "Sign In"
+
+#: app/__init__.py:98
+msgid "浅色模式"
+msgstr "Light Mode"
+
+#: app/__init__.py:99
+msgid "深色模式"
+msgstr "Dark Mode"
+
+#: app/__init__.py:100
+msgid "跟随系统"
+msgstr "Follow System"
+
+#: app/__init__.py:101
+msgid "Session 错误，请重新登录"
+msgstr "Session error, please sign in again"
+
+#: app/__init__.py:102
+msgid "系统错误"
+msgstr "System Error"
+
+#: app/__init__.py:103
+msgid "生成报告中..."
+msgstr "Generating report..."

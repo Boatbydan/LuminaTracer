@@ -4,7 +4,7 @@ Language: [English](README_EN.md) | [中文](README_CN.md)
 
 > A Web-Based Perimetry System
 
-**Lumina Tracer** is an open-source, web-based automated perimetry system. 
+**Lumina Tracer** is an open-source, web-based automated perimetry system.
 This project aims to explore the possibility of using standard computer monitors for low-cost visual field screening, providing a lightweight tool for ophthalmic research and preliminary screening.
 
 > I am someone who has been plagued by eye problems. During my long journey seeking medical help, I discovered that the limited equipment in hospitals cannot actually meet patients' needs. For example, booking a visual field test often requires waiting for days. So, can we use home devices to achieve more flexible visual field testing?
@@ -26,6 +26,21 @@ Currently, it should be able to intuitively reflect whether there are visual fun
 ### 🖥️ User Experience
 * **User Dashboard**: Complete user profile management and historical test record review.
 
+## 📊 Changelog
+
+### 1.0.0
+* Initial release
+* Visual Field Testing: Basic visual field testing, similar to HFA machine testing process, testing for visual field defects
+* Original Mode: Reference testing, based on past test results, detecting changes in current visual field compared to past tests
+* Result Analysis: Provides sensitivity numerical maps and grayscale maps to help users understand test results
+* User profile management, historical test record review, and other features
+
+### 1.1.0
+* Extended user dashboard and customization features
+* More elegant code structure
+* Visual Field Testing: Optimized testing process (better interference resistance)
+* Multi-language support
+
 ---
 
 ## 🚀 Installation & Running
@@ -46,7 +61,7 @@ Ensure your system has the following environment installed:
 
 #### 2. Get the Code
 ```bash
-git clone [https://github.com/Boatbydan/LuminaTracer.git](https://github.com/Boatbydan/LuminaTracer.git)
+git clone https://github.com/Boatbydan/LuminaTracer.git
 cd LuminaTracer
 ```
 
@@ -61,18 +76,17 @@ pip install -r requirements.txt
 ```
 
 ## 📖 Usage Guide
+* Video Tutorial: [LuminaTracer - Home Visual Field Testing Program](https://www.bilibili.com/video/BV1bLoDBeEWr)
+
 After running **Lumina Tracer**, you will enter the login/registration page.
-For first-time use, you can register with any email and password you like; there is no verification mechanism. The account must be in email format.
+Registration: For first-time use, you can register with any email and password you like; there is no verification mechanism. The account must be in email format.
 
 To obtain relatively accurate reference results, please strictly follow the following physical environment requirements:
 
-Environmental Preparation:
-
+* Environment Preparation:
 Keep the room dimly lit to avoid screen glare.
-Keep your eyes about 50-60cm away from the screen.
-Cover your right eye when testing the left eye, and vice versa.
-
-
+Keep your eyes at a distance from the screen, approximately allowing your visual field to cover the screen's short edge.
+When testing the left eye, cover the right eye, and vice versa.
 
 ### Operation Process:
 
@@ -81,18 +95,25 @@ Cover your right eye when testing the left eye, and vice versa.
 * Operation: Always fixate on the cross in the center of the screen. When you sense a light spot flickering in your peripheral vision, immediately press the spacebar.
 * View Report: After the test is completed, the system will automatically generate an analysis report.
 
-### Operation Process Screenshots
+### Operation Screenshots
+* v1.1.0 - Extended dashboard and multi-language support
+
+| User Interface | Settings Interface |
+|---------|---------|
+| ![User Interface](image/v1.1.0/user_screen.png) | ![Settings Interface](image/v1.1.0/setting.png) |
+
+* v1.0.0 - Registration, login, and visual field testing
 
 | Register/Login | Prepare Test | Test & Report |
 |---------------|-------------|---------------|
-| ![Sign Up](image/signup.jpg) | ![Prepare](image/prepare.jpg) | ![Testing](image/testing.jpg) |
-| ![Sign In](image/signin.jpg) | ![Start Test](image/start_test.jpg) | ![Report](image/report.jpg) |
+| ![Sign Up](image/v1.0.0/signup.jpg) | ![Prepare](image/v1.0.0/prepare.jpg) | ![Testing](image/v1.0.0/testing.jpg) |
+| ![Sign In](image/v1.0.0/signin.jpg) | ![Start Test](image/v1.0.0/start_test.jpg) | ![Report](image/v1.0.0/report.jpg) |
 
 *Note: Images are arranged in the order of operation, from left to right, top to bottom: Sign Up → Sign In → Prepare Test → Start Test → Testing → View Report*
 
 ## 🚧 TODO
+[*] Multi-language support
 [ ] Multi-platform support
-[ ] Multi-language support
 [ ] Scientific calibration method
 [ ] Algorithm upgrade (improve normal visual field reference)
 [ ] Report tracking and analysis
