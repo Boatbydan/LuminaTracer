@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="zh">
+<html lang="{{ lang_code }}" data-bs-theme="{{ current_user.theme }}">
 <head>
-    <title>数据分析仪表盘</title>
+    <title>{{ _("数据分析仪表盘") }}</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 40px; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -15,20 +14,21 @@
         .miss-badge { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
         .empty-state { text-align: center; color: #999; padding: 40px; }
     </style>
+    <link href="{{ url_for('static', filename='css/theme-base.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>测试历史档案</h1>
-        
+        <h1>{{ _("测试历史档案") }}</h1>
+
         {% if reports %}
         <table>
             <thead>
                 <tr>
-                    <th>测试时间</th>
-                    <th>Session ID (后4位)</th>
-                    <th>测试点数</th>
-                    <th>漏看数 (Miss)</th>
-                    <th>操作</th>
+                    <th>{{ _("测试时间") }}</th>
+                    <th>{{ _("Session ID (后4位)") }}</th>
+                    <th>{{ _("测试点数") }}</th>
+                    <th>{{ _("漏看数 (Miss)") }}</th>
+                    <th>{{ _("操作") }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,7 +45,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/analysis/report/{{ row['session_id'] }}" class="btn">查看详细报告</a>
+                        <a href="/analysis/report/{{ row['session_id'] }}" class="btn">{{ _("查看详细报告") }}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -53,8 +53,8 @@
         </table>
         {% else %}
             <div class="empty-state">
-                <p>暂无测试记录</p>
-                <a href="/" class="btn">开始第一次测试</a>
+                <p>{{ _("暂无测试记录") }}</p>
+                <a href="/" class="btn">{{ _("开始第一次测试") }}</a>
             </div>
         {% endif %}
     </div>

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="{{ lang_code }}" data-bs-theme="{{ current_user.theme }}">
 <head>
     <meta charset="UTF-8">
@@ -174,40 +175,40 @@
 
         <div class="info-section">
             <div class="info-group">
-                <h4>Patient Profile</h4>
-                <div class="info-row"><span class="info-label">Name</span> <span class="info-val">{{ meta['name'] }}</span></div>
-                <div class="info-row"><span class="info-label">Age / Gender</span> <span class="info-val">{{ meta['age'] }} / {{ meta['gender'] }}</span></div>
-                <div class="info-row"><span class="info-label">Patient ID</span> <span class="info-val">{{ meta['user_id'] }}</span></div>
+                <h4>{{ _("患者信息") }}</h4>
+                <div class="info-row"><span class="info-label">{{ _("姓名") }}</span> <span class="info-val">{{ meta['name'] }}</span></div>
+                <div class="info-row"><span class="info-label">{{ _("年龄 / 性别") }}</span> <span class="info-val">{{ meta['age'] }} / {{ meta['gender'] }}</span></div>
+                <div class="info-row"><span class="info-label">{{ _("患者ID") }}</span> <span class="info-val">{{ meta['user_id'] }}</span></div>
             </div>
 
             <div class="info-group">
-                <h4>Test Parameters</h4>
-                <div class="info-row"><span class="info-label">Strategy</span> <span class="info-val">Adaptive Bayesian</span></div>
-                <div class="info-row"><span class="info-label">Pattern</span> <span class="info-val">{{ meta['test_mode'] or 'Standard 24-2' }}</span></div>
-                <div class="info-row"><span class="info-label">Stimulus</span> <span class="info-val">Size III, White</span></div>
-                <div class="info-row"><span class="info-label">Background</span> <span class="info-val">31.5 ASB</span></div>
+                <h4>{{ _("测试参数") }}</h4>
+                <div class="info-row"><span class="info-label">{{ _("策略") }}</span> <span class="info-val">{{ _("自适应贝叶斯") }}</span></div>
+                <div class="info-row"><span class="info-label">{{ _("模式") }}</span> <span class="info-val">{{ meta['test_mode'] or _('标准 24-2') }}</span></div>
+                <div class="info-row"><span class="info-label">{{ _("刺激") }}</span> <span class="info-val">Size III, White</span></div>
+                <div class="info-row"><span class="info-label">{{ _("背景") }}</span> <span class="info-val">31.5 ASB</span></div>
                 {% if meta['is_incremental'] %}
-                <div class="info-row" style="color: #007bff; font-weight: 500;"><span class="info-label">Test Type</span> <span class="info-val">Reference Test</span></div>
+                <div class="info-row" style="color: #007bff; font-weight: 500;"><span class="info-label">{{ _("测试类型") }}</span> <span class="info-val">{{ _("参考测试") }}</span></div>
                 {% if meta.get('reference_test') %}
-                <div class="info-row"><span class="info-label">Reference Test</span> <span class="info-val">{{ meta['reference_test']['created_at'].strftime('%Y-%m-%d %H:%M') }}</span></div>
+                <div class="info-row"><span class="info-label">{{ _("参考测试") }}</span> <span class="info-val">{{ meta['reference_test']['created_at'].strftime('%Y-%m-%d %H:%M') }}</span></div>
                 {% endif %}
                 {% endif %}
             </div>
 
             <div class="info-group">
-                <h4>Reliability Indices</h4>
+                <h4>{{ _("可靠性指标") }}</h4>
                 <div class="info-row">
-                    <span class="info-label">Fixation Losses</span> 
+                    <span class="info-label">{{ _("固视丢失") }}</span>
                     <span class="info-val" style="{{ 'color:red;' if (meta['fixation_losses'] > 0 and (meta['fixation_losses'] / (meta['total_catch_trials'] or 1) > 0.3)) else '' }}">
                         {{ meta['fixation_losses'] }} / {{ meta['total_catch_trials'] }}
                     </span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">False Positives</span> 
+                    <span class="info-label">{{ _("假阳性") }}</span>
                     <span class="info-val">{{ meta['false_positives'] or 0 }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Duration</span> 
+                    <span class="info-label">{{ _("时长") }}</span>
                     <span class="info-val">--:--</span>
                 </div>
             </div>
@@ -219,44 +220,44 @@
                     <img src="data:image/png;base64,{{ report_img }}" class="chart-img" alt="Visual Field Map">
                 </div>
                 <div class="legend-box">
-                    <div class="legend-item"><span>Left:</span> Sensitivity Values (dB)</div>
-                    <div class="legend-item"><span>Right:</span> Interpolated Grayscale Map</div>
+                    <div class="legend-item"><span>{{ _("左图:") }}</span> {{ _("灵敏度值 (dB)") }}</div>
+                    <div class="legend-item"><span>{{ _("右图:") }}</span> {{ _("插值灰度图") }}</div>
                 </div>
             {% else %}
                 <div style="padding: 80px; background: #f8f9fa; border: 2px dashed #ddd; border-radius: 8px; color: #777;">
-                    <h3>Insufficient Data</h3>
-                    <p>Not enough valid points to generate field topography.</p>
+                    <h3>{{ _("数据不足") }}</h3>
+                    <p>{{ _("有效点位不足，无法生成视野地形图。") }}</p>
                 </div>
             {% endif %}
         </div>
 
         <div class="footer">
-            <strong>LUMINA TRACER SYSTEM v{{ project_version }}</strong> &bull; Perimetry System<br>
-            Analysis based on Thin Plate Spline (TPS) interpolation and ZEST-compatible logic.<br>
-            This report is for reference only and does not replace professional medical diagnosis.
+            <strong>{{ _("LUMINA TRACER 系统") }} v{{ project_version }}</strong> &bull; {{ _("视野计系统") }}<br>
+            {{ _("基于薄板样条（TPS）插值和 ZEST 兼容逻辑的分析。") }}<br>
+            {{ _("本报告仅供参考，不能替代专业医疗诊断。") }}
         </div>
 
         <div class="action-bar" data-html2canvas-ignore="true">
             {% if from_param == 'reports' %}
                 <a href="{{ url_for('reports.dashboard') }}" class="btn btn-secondary">
-                    &larr; Return to Previous Page
+                    &larr; {{ _("返回上一界面") }}
                 </a>
             {% else %}
                 <a href="{{ url_for('vision.vision_dashboard') }}" class="btn btn-secondary">
-                    &larr; Return to Previous Page
+                    &larr; {{ _("返回上一界面") }}
                 </a>
             {% endif %}
-            
+
             <a href="{{ url_for('vision.prepare_incremental_test', reference_session_id=meta['session_id'], eye=meta['eye']) }}" class="btn btn-success">
-                Start Reference Test
+                {{ _("开始参考测试") }}
             </a>
-            
+
             <button onclick="window.print()" class="btn btn-primary">
-                Print Report
+                {{ _("打印报告") }}
             </button>
-            
+
             <button onclick="previewPDF()" class="btn btn-info">
-                Open as PDF (W)
+                {{ _("打开为 PDF (W)") }}
             </button>
         </div>
     </div>
@@ -269,7 +270,7 @@
             const btn = event.target;
             const originalText = btn.innerText;
 
-            btn.innerText = "Generating...";
+            btn.innerText = "{{ _("生成中...") }}";
             btn.disabled = true;
             document.body.style.cursor = 'wait';
 
@@ -361,10 +362,10 @@
             .then(data => {
                 document.body.style.cursor = 'default';
                 if(data.status === 'success') {
-                    btn.innerText = "PDF Opened";
+                    btn.innerText = "{{ _("PDF 已打开") }}";
                 } else {
-                    alert("System Viewer Error: " + data.msg);
-                    btn.innerText = "Error";
+                    alert("{{ _("系统查看器错误：") }}" + data.msg);
+                    btn.innerText = "{{ _("错误") }}";
                 }
                 setTimeout(() => {
                     btn.innerText = originalText;
@@ -375,8 +376,8 @@
                 console.error(err);
                 element.style.margin = originalMargin;
                 document.body.style.cursor = 'default';
-                btn.innerText = "Failed";
-                alert("PDF Generation Failed.");
+                btn.innerText = "{{ _("失败") }}";
+                alert("{{ _("PDF 生成失败。") }}");
                 btn.disabled = false;
             });
         }

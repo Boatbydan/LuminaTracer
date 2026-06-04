@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-bs-theme="{{ user.theme }}">
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
 <head>
     <meta charset="UTF-8">
-    <title>设备校准 - Lumina Tracer</title>
+    <title>{{ _("设备校准") }} - Lumina Tracer</title>
     <link rel="icon" href="data:,">
     
     <!-- Bootstrap 5 CSS (local) -->
@@ -86,37 +86,37 @@
 
     <main class="calibration-main">
         <div class="calibration-card">
-            <h2 class="card-title">1. 距离校准 / Distance Calibration</h2>
-            
+            <h2 class="card-title">{{ _("1. 距离校准") }}</h2>
+
             <div class="form-group">
-                <label class="form-label">请输入您距离屏幕的距离（厘米） / Enter your distance from the screen (centimeters)</label>
+                <label class="form-label">{{ _("请输入您距离屏幕的距离（厘米）") }}</label>
                 <div>
                     <input type="range" id="distanceSlider" class="slider" min="20" max="100" value="30" step="1">
                     <span class="slider-value" id="distanceValue">30 cm</span>
                 </div>
-                
+
                 <div class="distance-guide">
-                    <h4>距离参考 / Distance Reference</h4>
+                    <h4>{{ _("距离参考") }}</h4>
                     <ul style="padding-left: 20px; margin-bottom: 0;">
-                        <li>最佳距离：<span id="optimalDistance">30</span>厘米（基于屏幕尺寸计算） / Optimal distance: <span id="optimalDistance">30</span> cm</li>
-                        <li>标准距离：30厘米（推荐） / Standard distance: 30 cm (Recommended)</li>
-                        <li>舒适距离：40-50厘米 / Comfortable distance: 40-50 cm</li>
-                        <li>最大距离：不超过100厘米 / Maximum distance: No more than 100 cm</li>
+                        <li>{{ _("最佳距离：") }}<span id="optimalDistance">30</span>{{ _("厘米（基于屏幕尺寸计算）") }}</li>
+                        <li>{{ _("标准距离：30厘米（推荐）") }}</li>
+                        <li>{{ _("舒适距离：40-50厘米") }}</li>
+                        <li>{{ _("最大距离：不超过100厘米") }}</li>
                     </ul>
                     <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107; font-size: 0.88em;">
-                        <strong>TODO：</strong> 后续将实现更精确的视野边界校准功能，包括视觉辅助工具和实时视角调整。
+                        <strong>TODO：</strong> {{ _("后续将实现更精确的视野边界校准功能，包括视觉辅助工具和实时视角调整。") }}
                     </div>
                 </div>
             </div>
 
-            <h2 class="card-title brightness-calibration">2. 亮度校准 / Brightness Calibration</h2>
-            
+            <h2 class="card-title brightness-calibration">{{ _("2. 亮度校准") }}</h2>
+
             <div class="instruction">
-                <h4>校准步骤 / Calibration Steps</h4>
+                <h4>{{ _("校准步骤") }}</h4>
                 <ol style="padding-left: 20px; margin-bottom: 0;">
-                    <li>调整您的屏幕亮度至舒适水平 / Adjust your screen brightness to a comfortable level</li>
-                    <li>确保测试环境光线适中，避免阳光直射 / Ensure moderate lighting, avoid direct sunlight</li>
-                    <li>观察下方测试区域，确保白色圆点清晰可见 / Observe the test area below, ensure the white dot is clearly visible</li>
+                    <li>{{ _("调整您的屏幕亮度至舒适水平") }}</li>
+                    <li>{{ _("确保测试环境光线适中，避免阳光直射") }}</li>
+                    <li>{{ _("观察下方测试区域，确保白色圆点清晰可见") }}</li>
                 </ol>
             </div>
 
@@ -125,7 +125,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">调整测试点亮度 / Adjust Test Point Brightness</label>
+                <label class="form-label">{{ _("调整测试点亮度") }}</label>
                 <div>
                     <input type="range" id="brightnessSlider" class="slider" min="10" max="100" value="50" step="5">
                     <span class="slider-value" id="brightnessValue">50%</span>
@@ -133,8 +133,11 @@
             </div>
 
             <div class="btn-container">
-                <button class="btn-calib btn-secondary-calib" onclick="resetCalibration()">重置为默认值 / Reset to Default</button>
-                <button class="btn-calib btn-primary-calib" onclick="saveCalibration()">保存校准设置 / Save Calibration</button>
+                <a href="{{ url_for('vision.vision_dashboard') }}" class="btn-calib btn-secondary-calib">
+                    <i class="bi bi-arrow-left me-1"></i>{{ _("返回测试页面") }}
+                </a>
+                <button class="btn-calib btn-secondary-calib" onclick="resetCalibration()">{{ _("重置为默认值") }}</button>
+                <button class="btn-calib btn-primary-calib" onclick="saveCalibration()">{{ _("保存校准设置") }}</button>
             </div>
         </div>
     </main>
@@ -172,7 +175,7 @@
         function saveCalibration() {
             localStorage.setItem('calibration_distance', distanceSlider.value);
             localStorage.setItem('calibration_brightness', brightnessSlider.value);
-            alert('校准设置已保存！');
+            alert('{{ _("校准设置已保存！") }}');
         }
 
         function loadSavedSettings() {
@@ -210,5 +213,7 @@
             initHubDashboard('{{ user.theme }}');
         };
     </script>
+
+    {% include '_footer.html' %}
 </body>
 </html>

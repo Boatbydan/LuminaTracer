@@ -1,0 +1,41 @@
+<footer class="app-footer">
+    <div class="container-fluid">
+        <div class="footer-content">
+            <div class="footer-left">
+                <span class="footer-brand">
+                    <i class="bi bi-eye-fill text-primary"></i>
+                    <strong>{{ project_name }}</strong>
+                </span>
+                <span class="footer-sep">&middot;</span>
+                <span class="footer-version">v{{ project_version }}</span>
+            </div>
+
+            <div class="footer-center">
+                <a href="{{ project_github }}" target="_blank" rel="noopener noreferrer"
+                   class="footer-link" title="{{ _('GitHub 仓库') }}">
+                    <i class="bi bi-github"></i> {{ _("GitHub") }}
+                </a>
+                <a href="{{ project_github }}" target="_blank" rel="noopener noreferrer"
+                   class="footer-link footer-star-btn" title="{{ _('给个 Star 支持项目发展') }}">
+                    <i class="bi bi-star-fill text-warning"></i> {{ _("Star") }}
+                </a>
+                <a href="{{ project_issues }}" target="_blank" rel="noopener noreferrer"
+                   class="footer-link" title="{{ _('反馈问题或建议') }}">
+                    <i class="bi bi-bug"></i> {{ _("反馈") }}
+                </a>
+                <a href="{{ project_releases }}" target="_blank" rel="noopener noreferrer"
+                   class="footer-link footer-update-btn" title="{{ _('检查更新') }}">
+                    <i class="bi bi-arrow-repeat"></i> {{ _("更新") }}
+                </a>
+                <a href="{{ project_tutorial }}" target="_blank" rel="noopener noreferrer"
+                   class="footer-link footer-tutorial-btn" title="{{ _('使用教程') }}">
+                    <i class="bi bi-play-circle"></i> {{ _("教程") }}
+                </a>
+            </div>
+
+            <div class="footer-right">
+                <span class="footer-notice">{{ project_description }}</span>
+            </div>
+        </div>
+    </div>
+</footer>

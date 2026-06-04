@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
+<head>
+    <title>Lumina Dashboard - {{ user.name }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    
+    <!-- Bootstrap 5 CSS (local) -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Bootstrap Icons (local) -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <!-- Hub 定制样式 -->
+    <link href="{{ url_for('static', filename='css/hub.css') }}" rel="stylesheet">
+    <!-- 页面特有样式 -->
+    <link href="{{ url_for('static', filename='css/theme-base.css') }}" rel="stylesheet">
+    
+    <style>
+        /* --- 页面内容区适配 fixed-top 导航栏 --- */
+        .vision-main { max-width: 900px; margin: 0 auto; padding: 80px 30px 30px; }
+        
+        /* --- 消息提示框 --- */
+        .flash-messages { margin-bottom: 20px; }
+        .flash-msg { padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; display: flex; align-items: center; }
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* --- 用户欢迎卡片 --- */
+        .profile-header { 
+            background: linear-gradient(135deg, rgba(0,123,255,0.08) 0%, rgba(0,86,179,0.08) 100%);
+            padding: 28px 32px; border-radius: 16px; margin-bottom: 28px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 20px rgba(0,123,255,0.1); 
+            border: 2px solid rgba(0,123,255,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+        }
+        .user-meta { color: #6c757d; font-size: 0.9em; margin-top: 8px; display: block; font-weight: 500; }
+
+        /* --- 核心：测试配置卡片 --- */
+        .config-card {
+            background: white; padding: 32px; border-radius: 16px;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.08); margin-bottom: 28px;
+            border: 2px solid rgba(0,123,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .config-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+        }
+        .config-title {
+            margin-top: 0; margin-bottom: 24px; font-size: 1.25em; color: #2c3e50;
+            border-bottom: 2px solid #f8f9fa; padding-bottom: 16px; font-weight: 700;
+        }
+
+        /* 眼别选择器 */
+        .form-group { margin-bottom: 26px; }
+        .eye-selector { display: flex; gap: 20px; }
+        .eye-selector input[type="radio"] { display: none; }
+        
+        .eye-option { flex: 1; cursor: pointer; }
+        .eye-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px; border: 2px solid #e9ecef; border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: #6c757d; background: #fff;
+        }
+        .eye-box:hover { border-color: #007bff; transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,123,255,0.1); }
+        
+        .eye-icon {
+            font-size: 20px; font-weight: 800; margin-bottom: 10px;
+            width: 52px; height: 52px; line-height: 52px; text-align: center;
+            background: #f1f3f5; border-radius: 50%; color: #adb5bd; transition: 0.3s;
+        }
+
+        .eye-selector input:checked + .eye-box {
+            border-color: #007bff; background-color: #f0f7ff; color: #007bff;
+            box-shadow: 0 6px 20px rgba(0,123,255,0.2);
+        }
+        .eye-selector input:checked + .eye-box .eye-icon {
+            background: #007bff; color: white;
+        }
+
+        /* 策略下拉框 */
+        .strategy-select {
+            width: 100%; padding: 12px; border: 1px solid #ced4da;
+            border-radius: 8px; font-size: 1rem; background-color: #fff;
+            outline: none; transition: border 0.2s;
+        }
+        .strategy-select:focus { border-color: #007bff; }
+        
+        .mode-desc-box {
+            font-size: 0.85em; color: #666; margin-top: 10px;
+            background: #f8f9fa; padding: 12px; border-radius: 6px;
+            border-left: 3px solid #ced4da; line-height: 1.5;
+        }
+
+        /* 按钮样式 */
+        .btn-primary-custom {
+            width: 100%; padding: 16px; color: white; border: none; border-radius: 12px;
+            font-size: 1.1em; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center; display: inline-block; text-decoration: none;
+            box-sizing: border-box;
+        }
+        
+        .btn-start-test {
+            background: linear-gradient(135deg, #28a745 0%, #208838 100%);
+            box-shadow: 0 10px 35px rgba(40, 167, 69, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            font-size: 1.3em; padding: 20px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-start-test::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn-start-test:hover::before {
+            left: 100%;
+        }
+        .btn-start-test:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(40,167,69,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        }
+        
+        .btn-reference-test {
+            background: linear-gradient(135deg, #007bff 0%, #0069d9 100%);
+            box-shadow: 0 6px 18px rgba(0,123,255,0.25); margin-top: 16px;
+        }
+        .btn-reference-test:hover {
+            transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,123,255,0.35);
+        }
+
+        /* --- 历史记录表格 --- */
+        .history-panel { 
+            background: white; padding: 32px; border-radius: 16px; 
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #eef0f3; 
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { padding: 12px; text-align: left; border-bottom: 2px solid #f1f3f5; color: #6c757d; font-size: 0.9em; font-weight: 600; text-transform: uppercase; }
+        td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f8f9fa; color: #333; font-size: 0.95em; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(0,123,255,0.02); }
+        
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; display: inline-block; }
+        .badge-left { background: linear-gradient(135deg, rgba(13,71,161,0.1) 0%, rgba(13,71,161,0.15) 100%); color: #0d47a1; border: 1px solid rgba(13,71,161,0.2); }
+        .badge-right { background: linear-gradient(135deg, rgba(183,28,28,0.1) 0%, rgba(183,28,28,0.15) 100%); color: #b71c1c; border: 1px solid rgba(183,28,28,0.2); }
+        .badge-mode { background: linear-gradient(135deg, rgba(73,80,87,0.08) 0%, rgba(73,80,87,0.12) 100%); color: #495057; border: 1px solid rgba(73,80,87,0.15); }
+
+        .btn-sm { padding: 8px 14px; font-size: 0.9em; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; display: inline-block; font-weight: 600; }
+        .btn-view { background: linear-gradient(135deg, rgba(0,123,255,0.1) 0%, rgba(0,123,255,0.15) 100%); color: #007bff; border: 1px solid rgba(0,123,255,0.2); }
+        .btn-view:hover { background: rgba(0,123,255,0.2); transform: translateY(-1px); }
+        .btn-delete { background: transparent; color: #adb5bd; }
+        .btn-delete:hover { color: #dc3545; text-decoration: underline; }
+
+        /* 筛选按钮样式 */
+        .filter-btn {
+            background: rgba(255,255,255,0.9); color: #6c757d; padding: 6px 14px;
+            border-radius: 20px; font-size: 0.85em; font-weight: 600;
+            border: 1px solid #dee2e6; cursor: pointer; transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            background: rgba(0,123,255,0.1); color: #007bff; border-color: rgba(0,123,255,0.2);
+        }
+        .filter-btn-active {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white; border-color: #007bff;
+        }
+        .filter-btn-active:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        }
+
+        .admin-link { display: block; text-align: center; margin-top: 36px; border-top: 1px dashed #ccc; padding-top: 18px; opacity: 0.55; }
+        .admin-link:hover { opacity: 1; }
+
+        /* 校准提示区域 */
+        .calibration-banner {
+            margin-bottom: 28px; padding: 24px; background: linear-gradient(135deg, rgba(0,123,255,0.08) 0%, rgba(0,86,179,0.08) 100%); border-radius: 12px;
+            border-left: 4px solid #007bff; box-shadow: 0 4px 12px rgba(0,123,255,0.08);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .calibration-banner a {
+            background: linear-gradient(135deg, #007bff 0%, #0069d9 100%); color: white;
+            padding: 12px 24px; border-radius: 10px; text-decoration: none;
+            font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+            white-space: nowrap;
+        }
+        .calibration-banner a:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,123,255,0.3); }
+    </style>
+</head>
+<body class="hub-body">
+
+    <!-- 统一导航栏 -->
+    {% include '_navbar.html' %}
+
+    <!-- 主内容区 -->
+    <main class="vision-main">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-msg flash-{{ category }}">
+                    <span style="margin-right: 10px;">{{ '✓' if category == 'success' else '⚠️' }}</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- 用户欢迎 -->
+        <div class="profile-header">
+            <div>
+                <h1 style="margin:0; font-size: 1.2em; font-weight: 600; color: #343a40;">Hi, {{ user.name }}</h1>
+                <span class="user-meta">{{ user.age }} Years Old &bull; {{ user.gender }} &bull; ID: #{{ user.id }}</span>
+            </div>
+        </div>
+
+        <!-- 测试说明卡片 -->
+        <div class="config-card" style="background: linear-gradient(135deg, rgba(0,123,255,0.08) 0%, rgba(0,86,179,0.08) 100%); border: 2px solid rgba(0,123,255,0.2); border-radius: 16px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);"></div>
+            
+            <h3 class="config-title" style="color: #007bff; border-bottom-color: rgba(0,123,255,0.2); margin-bottom: 20px;">
+                <i class="bi bi-info-circle-fill me-2"></i>{{ _("测试说明") }}
+            </h3>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div style="padding: 20px; background: rgba(255,255,255,0.9); border-radius: 12px; border: 1px solid rgba(0,123,255,0.15); height: 100%;">
+                        <h5 style="margin-top: 0; margin-bottom: 15px; font-size: 1.05em; color: #495057; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-clock" style="color: #007bff; font-size: 1.2rem;"></i>{{ _("测试时长预估") }}
+                        </h5>
+                        <div style="font-size: 0.95em; color: #6c757d; line-height: 1.8;">
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+                                <span style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.85em; font-weight: 600;">{{ _("标准") }}</span>
+                                <span style="font-weight: 600; color: #495057;">{{ _("约 8-12 分钟") }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.85em; font-weight: 600;">{{ _("快速") }}</span>
+                                <span style="font-weight: 600; color: #495057;">{{ _("约 4-6 分钟") }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div style="padding: 20px; background: rgba(255,255,255,0.9); border-radius: 12px; border: 1px solid rgba(0,123,255,0.15); height: 100%;">
+                        <h5 style="margin-top: 0; margin-bottom: 15px; font-size: 1.05em; color: #495057; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-list-check" style="color: #007bff; font-size: 1.2rem;"></i>{{ _("测试流程") }}
+                        </h5>
+                        <div style="font-size: 0.95em; color: #6c757d; line-height: 1.8;">
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+                                <span style="background: #007bff; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.85em; font-weight: 700;">1</span>
+                                <span style="font-weight: 600; color: #495057;">{{ _("选择眼别和测试策略") }}</span>
+                            </div>
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+                                <span style="background: #007bff; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.85em; font-weight: 700;">2</span>
+                                <span style="font-weight: 600; color: #495057;">{{ _("确认测试环境") }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span style="background: #007bff; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.85em; font-weight: 700;">3</span>
+                                <span style="font-weight: 600; color: #495057;">{{ _("开始测试并查看报告") }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(255,193,7,0.08) 0%, rgba(255,193,7,0.12) 100%); border-radius: 12px; border-left: 4px solid #ffc107; display: flex; align-items: center; gap: 12px;">
+                <i class="bi bi-lightbulb-fill" style="color: #ffc107; font-size: 1.3rem;"></i>
+                <div style="font-size: 0.92em; color: #856404; line-height: 1.5;">
+                    <strong style="font-weight: 700;">{{ _("提示：") }}</strong>{{ _("测试前请确保环境光线适中，保持专注。详细注意事项将在测试准备页面展示。") }}
+                </div>
+            </div>
+        </div>
+
+        <div class="config-card">
+            <h3 class="config-title">{{ _("新建测试") }}</h3>
+
+            <div class="calibration-banner">
+                <div>
+                    <h4 style="margin-top: 0; color: #007bff; font-size: 1.05em; font-weight: 600;">{{ _("设备校准") }}</h4>
+                    <p style="margin-bottom: 0; font-size: 0.92em; color: #495057; line-height: 1.4;">{{ _("调整距离和亮度设置，确保测试结果的准确性") }}</p>
+                </div>
+                <a href="{{ url_for('vision.calibration') }}">{{ _("前往校准") }}</a>
+            </div>
+            
+            <form action="{{ url_for('vision.prepare_test') }}" method="POST">
+                
+                <div class="form-group">
+                    <label style="font-weight: 600; margin-bottom: 12px; display: block; color: #495057;">{{ _("眼别") }}</label>
+                    <div class="eye-selector">
+                        <label class="eye-option">
+                            <input type="radio" name="eye" value="L" required checked>
+                            <div class="eye-box">
+                                <div class="eye-icon">OS</div>
+                                <div>{{ _("左眼") }}</div>
+                            </div>
+                        </label>
+
+                        <label class="eye-option">
+                            <input type="radio" name="eye" value="R" required>
+                            <div class="eye-box">
+                                <div class="eye-icon">OD</div>
+                                <div>{{ _("右眼") }}</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modeSelect" style="font-weight: 600; margin-bottom: 10px; display: block; color: #495057;">{{ _("测试策略") }}</label>
+                    <select name="test_mode" id="modeSelect" class="strategy-select" onchange="updateModeDesc()">
+                        {% for mode in modes %}
+                            <option value="{{ mode.id }}" data-desc="{{ mode.desc }}">
+                                {{ mode.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div id="modeDescription" class="mode-desc-box">
+                        {{ _("加载描述中...") }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary-custom btn-start-test">
+                    <i class="bi bi-play-circle-fill me-2"></i>{{ _("开始测试") }}
+                </button>
+
+                <a href="{{ url_for('vision.prepare_incremental_test') }}" class="btn-primary-custom btn-reference-test">
+                    <i class="bi bi-arrow-repeat me-2"></i>{{ _("参考测试") }}
+                </a>
+            </form>
+        </div>
+
+        <div class="history-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin-top:0; font-size: 1.25em; color: #2c3e50; font-weight: 700;">{{ _("测试历史") }}</h3>
+                <a href="{{ url_for('reports.dashboard', type='vision') }}" style="background: linear-gradient(135deg, rgba(0,123,255,0.1) 0%, rgba(0,123,255,0.15) 100%); color: #007bff; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9em; border: 1px solid rgba(0,123,255,0.2); transition: all 0.2s;">
+                    <i class="bi bi-file-earmark-medical me-1"></i>{{ _("查看所有报告") }}
+                </a>
+            </div>
+
+            {% if history %}
+            <div style="margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <button onclick="filterHistory('all')" class="filter-btn filter-btn-active" data-filter="all">{{ _("全部") }}</button>
+                <button onclick="filterHistory('L')" class="filter-btn" data-filter="L">{{ _("左眼") }}</button>
+                <button onclick="filterHistory('R')" class="filter-btn" data-filter="R">{{ _("右眼") }}</button>
+                <button onclick="filterHistory('mode_standard_v1')" class="filter-btn" data-filter="mode_standard_v1">{{ _("标准模式") }}</button>
+                <button onclick="filterHistory('mode_fast_v1')" class="filter-btn" data-filter="mode_fast_v1">{{ _("快速模式") }}</button>
+            </div>
+
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th width="20%">{{ _("日期") }}</th>
+                        <th width="15%">{{ _("眼别") }}</th>
+                        <th width="25%">{{ _("策略") }}</th>
+                        <th width="15%">{{ _("详情") }}</th>
+                        <th width="25%" style="text-align: right;">{{ _("操作") }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in history %}
+                        <tr data-eye="{{ record.eye }}" data-mode="{{ record.test_mode }}">
+                            <td style="color: #666; font-family: monospace;">
+                                {{ record.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </td>
+                            <td>
+                                {% if record.eye == 'L' %}
+                                    <span class="badge badge-left">OS (Left)</span>
+                                {% else %}
+                                    <span class="badge badge-right">OD (Right)</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge badge-mode">{{ record.test_mode or 'Standard' }}</span>
+                            </td>
+                            <td style="font-size: 0.9em; color: #888;">
+                                {{ record.total_pts }} pts
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <a href="{{ url_for('vision.analysis_report', session_id=record.session_id) }}" class="btn-sm btn-view" style="display: inline-block;">{{ _("报告") }}</a>
+                                <form action="{{ url_for('vision.delete_record', session_id=record.session_id) }}" method="POST" style="display: inline-block; margin-left: 6px;" onsubmit="return confirm('{{ _("确定要删除此记录吗？此操作不可撤销。") }}');">
+                                    <button type="submit" class="btn-sm btn-delete" style="display: inline-block;">{{ _("删除") }}</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div style="text-align:center; padding: 50px; color: #adb5bd; font-style: italic;">
+                    {{ _("暂无记录，请开始您的第一次测试。") }}
+                </div>
+            {% endif %}
+        </div>
+
+        {#
+        <a href="{{ url_for('admin.dashboard') }}" class="admin-link">Admin Panel</a>
+        #}
+    </main> 
+
+    <!-- Bootstrap JS Bundle (local) -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- Hub 交互逻辑（含主题切换） -->
+    <script src="{{ url_for('static', filename='js/hub.js') }}"></script>
+    <script>
+        function updateModeDesc() {
+            const select = document.getElementById('modeSelect');
+            const descBox = document.getElementById('modeDescription');
+
+            if (select && select.options.length > 0) {
+                const selectedOption = select.options[select.selectedIndex];
+                const desc = selectedOption.getAttribute('data-desc');
+                descBox.innerText = desc ? desc : "{{ _("暂无描述") }}";
+            } else {
+                descBox.innerText = "{{ _("暂无可用模式") }}";
+            }
+        }
+
+        function filterHistory(filter) {
+            const table = document.getElementById('historyTable');
+            const rows = table.querySelectorAll('tbody tr');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('filter-btn-active');
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('filter-btn-active');
+                }
+            });
+
+            rows.forEach(row => {
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else {
+                    const eye = row.getAttribute('data-eye');
+                    const mode = row.getAttribute('data-mode');
+                    
+                    if (filter === 'L' || filter === 'R') {
+                        row.style.display = eye === filter ? '' : 'none';
+                    } else {
+                        row.style.display = mode === filter ? '' : 'none';
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateModeDesc();
+            initHubDashboard('{{ user.theme }}');
+        });
+    </script>
+
+    {% include '_footer.html' %}
+</body>
+</html>

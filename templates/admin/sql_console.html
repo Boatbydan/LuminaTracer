@@ -1,22 +1,21 @@
-<!DOCTYPE html>
-<html>
+<html lang="{{ lang_code }}">
 <head>
-    <title>SQL Console</title>
+    <title>{{ _("SQL 控制台") }}</title>
     <link rel="icon" href="data:,">
 </head>
 <body style="padding: 20px; font-family: monospace;">
-    <h2>SQL 执行控制台</h2>
-    <a href="/admin">返回</a>
-    
+    <h2>{{ _("SQL 执行控制台") }}</h2>
+    <a href="/admin">{{ _("返回") }}</a>
+
     <form method="POST" style="margin-top: 20px;">
         <textarea name="query" rows="5" style="width: 100%; font-family: monospace; font-size: 1.1em;" placeholder="SELECT * FROM test_records WHERE session_id = '...'"></textarea>
         <br><br>
-        <button type="submit" style="padding: 10px 20px;">执行 SQL</button>
+        <button type="submit" style="padding: 10px 20px;">{{ _("执行 SQL") }}</button>
     </form>
 
     {% if error %}
         <div style="color: red; border: 1px solid red; padding: 10px; margin-top: 20px;">
-            错误: {{ error }}
+            {{ _("错误:") }} {{ error }}
         </div>
     {% endif %}
 

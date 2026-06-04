@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html>
+<html lang="{{ lang_code }}">
 <head>
-    <title>后台管理系统</title>
+    <title>{{ _("后台管理系统") }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="data:,">
     <style>
@@ -12,15 +11,14 @@
     </style>
 </head>
 <body>
-    <h1>数据库管理控制台</h1>
-    <p>Database Explorer</p>
-    
+    <h1>{{ _("数据库管理控制台") }}</h1>
+
     <div style="margin-bottom: 30px;">
-        <a href="/admin/sql" style="color: yellow;">&gt;_ 进入 SQL 控制台</a> |
-        <a href="/" style="color: #ccc;">返回前台</a>
+        <a href="/admin/sql" style="color: yellow;">&gt;_ {{ _("进入 SQL 控制台") }}</a> |
+        <a href="/" style="color: #ccc;">{{ _("返回前台") }}</a>
     </div>
 
-    <h3>数据表列表:</h3>
+    <h3>{{ _("数据表列表:") }}</h3>
     <div>
         {% for t in tables %}
         <div class="card">

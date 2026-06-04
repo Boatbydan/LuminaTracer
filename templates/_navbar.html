@@ -1,0 +1,496 @@
+<nav class="navbar navbar-expand-lg modern-navbar {% if navbar_fixed %}fixed-top{% endif %}">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand brand-modern" href="{{ url_for('hub.dashboard') }}">
+            <div class="brand-icon-wrapper">
+                <i class="bi bi-eye-fill"></i>
+            </div>
+            <span class="brand-text">Lumina Tracer</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="{{ _('切换导航') }}">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-modern">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-modern {% if active_page == 'hub' %}active{% endif %}"
+                       href="{{ url_for('hub.dashboard') }}">
+                        <i class="bi bi-grid-1x2"></i>
+                        <span>{{ _("控制台") }}</span>
+                    </a>
+                </li>
+                {% if active_page == 'reports' %}
+                <li class="nav-item">
+                    <span class="nav-link nav-link-modern active">
+                        <i class="bi bi-file-earmark-medical"></i>
+                        <span>{{ _("报告管理") }}</span>
+                    </span>
+                </li>
+                {% endif %}
+                {% if active_page == 'vision' %}
+                <li class="nav-item">
+                    <span class="nav-link nav-link-modern active">
+                        <i class="bi bi-eye"></i>
+                        <span>{{ _("视野测试") }}</span>
+                    </span>
+                </li>
+                {% elif active_page == 'calibration' %}
+                <li class="nav-item">
+                    <span class="nav-link nav-link-modern active">
+                        <i class="bi bi-crosshair"></i>
+                        <span>{{ _("设备校准") }}</span>
+                    </span>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="d-flex align-items-center gap-2 navbar-actions">
+                <div class="language-switcher-nav dropdown">
+                    <button class="btn-lang-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            title="{{ _('切换语言') }}">
+                        <span class="lang-current">{{ '中文' if lang_code == 'zh' else 'EN' }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end lang-dropdown-nav">
+                        <li>
+                            <a class="dropdown-item {% if lang_code == 'zh' %}active{% endif %}"
+                               href="{{ url_for('auth.set_language', lang='zh') }}">
+                                <span class="lang-flag">🇨🇳</span>
+                                <span>中文</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item {% if lang_code == 'en' %}active{% endif %}"
+                               href="{{ url_for('auth.set_language', lang='en') }}">
+                                <span class="lang-flag">🇺🇸</span>
+                                <span>English</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <button class="btn-icon-action theme-toggle" id="themeToggleBtn"
+                        title="{{ _('切换主题') }}" onclick="toggleTheme()">
+                    <i class="bi {% if user_theme == 'light' %}bi-sun-fill{% elif user_theme == 'dark' %}bi-moon-stars-fill{% else %}bi-circle-half{% endif %}" id="themeIcon"></i>
+                </button>
+
+                <a class="btn-icon-action settings-btn" href="{{ url_for('hub.settings') }}"
+                   title="{{ _('设置') }}">
+                    <i class="bi bi-gear"></i>
+                </a>
+
+                <div class="dropdown user-dropdown">
+                    <button class="btn-user-toggle dropdown-toggle d-flex align-items-center" type="button"
+                            data-bs-toggle="dropdown">
+                        <div class="user-avatar">
+                            {{ user.name[0] if user.name else 'U' }}
+                        </div>
+                        <span class="user-name d-none d-md-inline">{{ user.name }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end user-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('hub.settings') }}">
+                            <i class="bi bi-person-gear me-2"></i>{{ _("个人设置") }}
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                            <i class="bi bi-box-arrow-right me-2"></i>{{ _("退出登录") }}
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<style>
+    .modern-navbar {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 12px 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .modern-navbar:hover {
+        border-bottom-color: rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .brand-modern {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none !important;
+        color: #1a1a1a !important;
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+        transition: opacity 0.2s ease;
+    }
+
+    .brand-modern:hover {
+        opacity: 0.8;
+    }
+
+    .brand-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+    }
+
+    .brand-text {
+        background: linear-gradient(135deg, #1a1a1a 0%, #4b5563 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .nav-modern {
+        gap: 4px;
+        margin-left: 24px !important;
+    }
+
+    .nav-link-modern {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px !important;
+        color: #6b7280 !important;
+        font-weight: 500;
+        font-size: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        border-radius: 10px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 0 !important;
+    }
+
+    .nav-link-modem i,
+    .nav-link-modern i {
+        font-size: 15px;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+    }
+
+    .nav-link-modern:hover {
+        color: #374151 !important;
+        background: rgba(59, 130, 246, 0.06);
+    }
+
+    .nav-link-modern:hover i {
+        opacity: 1;
+    }
+
+    .nav-link-modern.active {
+        color: #2563eb !important;
+        background: rgba(59, 130, 246, 0.08);
+        font-weight: 600;
+    }
+
+    .nav-link-modern.active i {
+        opacity: 1;
+        color: #2563eb;
+    }
+
+    .nav-link-modern.active::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #2563eb);
+        border-radius: 2px;
+        animation: indicatorSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes indicatorSlide {
+        from {
+            width: 0;
+            opacity: 0;
+        }
+        to {
+            width: 20px;
+            opacity: 1;
+        }
+    }
+
+    .navbar-actions {
+        gap: 8px;
+    }
+
+    .btn-lang-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        height: 34px;
+        padding: 0 14px;
+        background: rgba(107, 114, 128, 0.08);
+        border: 1px solid rgba(107, 114, 128, 0.15);
+        border-radius: 9px;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .btn-lang-toggle::after {
+        content: '';
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid currentColor;
+        margin-left: 8px;
+        margin-top: 1px;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-lang-toggle:hover {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.2);
+        color: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+    }
+
+    .btn-lang-toggle.show {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.25);
+        color: #2563eb;
+    }
+
+    .btn-lang-toggle.show::after {
+        transform: rotate(180deg);
+    }
+
+    .lang-current {
+        letter-spacing: 0.02em;
+    }
+
+    .lang-dropdown-nav {
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        padding: 5px;
+        min-width: 160px;
+        box-shadow:
+            0 4px 6px rgba(0, 0, 0, 0.04),
+            0 12px 40px rgba(0, 0, 0, 0.12),
+            0 24px 80px rgba(0, 0, 0, 0.08);
+        margin-top: 8px !important;
+        animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        transform-origin: top right;
+    }
+
+    @keyframes dropdownSlide {
+        from {
+            opacity: 0;
+            transform: scale(0.96) translateY(-4px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .lang-dropdown-nav .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 2px;
+    }
+
+    .lang-dropdown-nav .dropdown-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .lang-dropdown-nav .dropdown-item:hover {
+        background: rgba(59, 130, 246, 0.06);
+        color: #2563eb;
+        transform: translateX(2px);
+    }
+
+    .lang-dropdown-nav .dropdown-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: #2563eb;
+        font-weight: 600;
+    }
+
+    .lang-flag {
+        font-size: 17px;
+        line-height: 1;
+    }
+
+    .btn-icon-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 34px;
+        background: rgba(107, 114, 128, 0.08);
+        border: 1px solid rgba(107, 114, 128, 0.15);
+        border-radius: 9px;
+        color: #6b7280;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none !important;
+    }
+
+    .btn-icon-action:hover {
+        background: rgba(107, 114, 128, 0.12);
+        border-color: rgba(107, 114, 128, 0.2);
+        color: #374151;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .settings-btn:hover {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.2);
+        color: #2563eb;
+    }
+
+    .user-dropdown .btn-user-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 12px 4px 4px;
+        background: transparent;
+        border: 1px solid rgba(107, 114, 128, 0.12);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-user-toggle::after {
+        margin-left: 8px;
+    }
+
+    .user-dropdown .btn-user-toggle:hover {
+        background: rgba(107, 114, 128, 0.05);
+        border-color: rgba(107, 114, 128, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .user-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+    }
+
+    .user-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .user-menu {
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        padding: 6px;
+        min-width: 200px;
+        box-shadow:
+            0 4px 6px rgba(0, 0, 0, 0.04),
+            0 12px 40px rgba(0, 0, 0, 0.12);
+        margin-top: 8px !important;
+    }
+
+    .user-menu .dropdown-item {
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        margin-bottom: 2px;
+    }
+
+    .user-menu .dropdown-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .user-menu .dropdown-item:hover {
+        background: rgba(59, 130, 246, 0.06);
+        color: #2563eb;
+    }
+
+    .user-menu .dropdown-divider {
+        margin: 6px 0;
+        border-color: rgba(0, 0, 0, 0.06);
+    }
+
+    @media (max-width: 991.98px) {
+        .modern-navbar {
+            padding: 10px 0;
+        }
+
+        .nav-modern {
+            margin-left: 0 !important;
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(107, 114, 128, 0.04);
+            border-radius: 12px;
+        }
+
+        .nav-link-modern {
+            padding: 10px 14px !important;
+        }
+
+        .nav-link-modern.active::after {
+            bottom: 4px;
+        }
+
+        .navbar-actions {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .brand-text {
+            display: none;
+        }
+
+        .user-name {
+            display: none !important;
+        }
+    }
+</style>

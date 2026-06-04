@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _("报告管理") }} - Lumina Tracer</title>
+    <link rel="icon" href="data:,">
+    
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/hub.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-base.css') }}" rel="stylesheet">
+    
+    <style>
+        .reports-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 24px 40px;
+        }
+        
+        .reports-hero {
+            position: relative;
+            padding: 2rem 2.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        .reports-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        [data-bs-theme="dark"] .reports-hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        .reports-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .reports-hero h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .reports-hero p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        
+        .reports-stats-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .reports-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.85rem;
+        }
+        
+        [data-bs-theme="dark"] .reports-stat-item {
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .reports-stat-number {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .filter-bar-enhanced {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            background: rgba(102,126,234,0.04);
+            border: 1px solid rgba(102,126,234,0.1);
+            border-radius: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        [data-bs-theme="dark"] .filter-bar-enhanced {
+            background: rgba(102,126,234,0.08);
+            border-color: rgba(102,126,234,0.15);
+        }
+        
+        .filter-group-enhanced {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-label-enhanced {
+            font-size: 13px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        [data-bs-theme="dark"] .filter-label-enhanced {
+            color: #adb5bd;
+        }
+        
+        .filter-select-enhanced {
+            padding: 8px 14px;
+            border: 1px solid rgba(102,126,234,0.2);
+            border-radius: 8px;
+            background: rgba(102,126,234,0.06);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            min-width: 120px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-select-enhanced:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+        
+        .search-box-enhanced {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .search-input-enhanced {
+            width: 100%;
+            padding: 8px 14px 8px 38px;
+            border: 1px solid rgba(102,126,234,0.2);
+            border-radius: 8px;
+            background: rgba(102,126,234,0.06);
+            color: var(--text-primary);
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        
+        .search-input-enhanced:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+        
+        .search-icon-enhanced {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+        }
+        
+        .view-toggle-enhanced {
+            display: flex;
+            gap: 4px;
+            background: rgba(102,126,234,0.06);
+            padding: 4px;
+            border-radius: 8px;
+        }
+        
+        .view-btn-enhanced {
+            padding: 6px 10px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .view-btn-enhanced.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .view-btn-enhanced:hover:not(.active) {
+            background: rgba(102,126,234,0.1);
+            color: #667eea;
+        }
+        
+        .expand-btn-enhanced {
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #667eea;
+            background: rgba(102,126,234,0.06);
+            border: 1px solid rgba(102,126,234,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .expand-btn-enhanced:hover {
+            background: rgba(102,126,234,0.12);
+        }
+        
+        .date-group-enhanced {
+            margin-bottom: 16px;
+            border: 1px solid rgba(102,126,234,0.1);
+            border-radius: 12px;
+            background: rgba(102,126,234,0.02);
+            overflow: hidden;
+        }
+        
+        [data-bs-theme="dark"] .date-group-enhanced {
+            background: rgba(102,126,234,0.04);
+            border-color: rgba(102,126,234,0.15);
+        }
+        
+        .group-header-enhanced {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            user-select: none;
+        }
+        
+        .group-header-enhanced:hover {
+            background: rgba(102,126,234,0.08);
+        }
+        
+        [data-bs-theme="dark"] .group-header-enhanced:hover {
+            background: rgba(102,126,234,0.12);
+        }
+        
+        .group-left-enhanced {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .group-toggle-enhanced {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .group-toggle-enhanced.collapsed {
+            transform: rotate(-90deg);
+        }
+        
+        .group-label-enhanced {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .group-count-enhanced {
+            font-size: 12px;
+            color: #667eea;
+            background: rgba(102,126,234,0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .group-content-enhanced {
+            padding: 0 18px 14px;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .group-content-enhanced.collapsed {
+            display: none;
+        }
+        
+        .report-list-enhanced {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .report-card-enhanced {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: rgba(102,126,234,0.04);
+            border-radius: 10px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        
+        .report-card-enhanced:hover {
+            background: rgba(102,126,234,0.08);
+            border-color: rgba(102,126,234,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+        }
+        
+        [data-bs-theme="dark"] .report-card-enhanced {
+            background: rgba(102,126,234,0.06);
+        }
+        
+        [data-bs-theme="dark"] .report-card-enhanced:hover {
+            background: rgba(102,126,234,0.12);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.2);
+        }
+        
+        .report-info-enhanced {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .report-icon-enhanced {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(102,126,234,0.15) 0%, rgba(118,75,162,0.15) 100%);
+            border-radius: 10px;
+            color: #667eea;
+            transition: all 0.25s ease;
+        }
+        
+        .report-card-enhanced:hover .report-icon-enhanced {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .report-title-enhanced {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .report-meta-enhanced {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        [data-bs-theme="dark"] .report-meta-enhanced {
+            color: #adb5bd;
+        }
+        
+        .meta-tag-enhanced {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .meta-tag-enhanced.eye-left { color: #3b82f6; }
+        .meta-tag-enhanced.eye-right { color: #ef4444; }
+        
+        .status-badge-enhanced {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .status-completed-enhanced {
+            background: rgba(56,239,125,0.15);
+            color: #38ef7d;
+        }
+        
+        .status-partial-enhanced {
+            background: rgba(240,147,251,0.15);
+            color: #f093fb;
+        }
+        
+        [data-bs-theme="dark"] .status-completed-enhanced {
+            background: rgba(56,239,125,0.2);
+        }
+        
+        [data-bs-theme="dark"] .status-partial-enhanced {
+            background: rgba(240,147,251,0.2);
+        }
+        
+        .report-time-enhanced {
+            font-size: 12px;
+            color: #6c757d;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        [data-bs-theme="dark"] .report-time-enhanced {
+            color: #adb5bd;
+        }
+        
+        .report-actions-enhanced {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn-action-enhanced {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-view-enhanced {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-view-enhanced:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+        }
+        
+        .btn-delete-enhanced {
+            background: rgba(220,53,69,0.1);
+            color: #dc3545;
+        }
+        
+        .btn-delete-enhanced:hover {
+            background: rgba(220,53,69,0.2);
+        }
+        
+        .grid-view .report-list-enhanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+        }
+        
+        .grid-view .report-card-enhanced {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 16px;
+            gap: 12px;
+        }
+        
+        .grid-view .report-info-enhanced {
+            width: 100%;
+        }
+        
+        .grid-view .report-time-enhanced {
+            text-align: left;
+            min-width: auto;
+        }
+        
+        .grid-view .report-actions-enhanced {
+            width: 100%;
+            justify-content: flex-end;
+        }
+        
+        .grid-view .report-meta-enhanced {
+            flex-wrap: wrap;
+        }
+        
+        .empty-state-enhanced-reports {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon-enhanced {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            color: #667eea;
+            font-size: 2rem;
+        }
+        
+        [data-bs-theme="dark"] .empty-icon-enhanced {
+            background: linear-gradient(135deg, rgba(102,126,234,0.15) 0%, rgba(118,75,162,0.15) 100%);
+        }
+        
+        .empty-title-enhanced {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        [data-bs-theme="dark"] .empty-title-enhanced {
+            color: #adb5bd;
+        }
+        
+        .empty-desc-enhanced {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-btn-enhanced {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 10px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        
+        .empty-btn-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+            color: #fff;
+        }
+        
+        .no-results-enhanced {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-results-icon-enhanced {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: rgba(102,126,234,0.1);
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .reports-container {
+                padding: 70px 16px 30px;
+            }
+            
+            .reports-hero {
+                padding: 1.5rem;
+            }
+            
+            .reports-hero h1 {
+                font-size: 1.25rem;
+            }
+            
+            .filter-bar-enhanced {
+                padding: 12px 14px;
+            }
+            
+            .reports-stats-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="hub-body">
+    
+    {% include '_navbar.html' %}
+
+    <main class="reports-container">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show shadow" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="reports-hero animate-fade-in-up">
+            <div class="reports-hero-content">
+                <h1>
+                    <i class="bi bi-file-earmark-medical"></i>
+                    {{ _("报告管理") }}
+                </h1>
+                <p>{{ _("查看和管理您的所有视野测试报告") }}</p>
+                <div class="reports-stats-row">
+                    <div class="reports-stat-item">
+                        <i class="bi bi-folder2-open"></i>
+                        <span class="reports-stat-number">{{ total_count }}</span>
+                        <span>{{ _("份报告") }}</span>
+                    </div>
+                    {% for t in types %}
+                    <div class="reports-stat-item">
+                        <i class="bi bi-file-earmark"></i>
+                        <span>{{ t.name }}</span>
+                        <span class="reports-stat-number">{{ t.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="filter-bar-enhanced animate-fade-in-up delay-1">
+            <div class="filter-group-enhanced">
+                <span class="filter-label-enhanced">{{ _("类型") }}</span>
+                <select class="filter-select-enhanced" id="type-filter" onchange="applyFilter()">
+                    <option value="">{{ _("全部类型") }}</option>
+                    {% for t in types %}
+                    <option value="{{ t.type }}" {% if current_type == t.type %}selected{% endif %}>
+                        {{ t.name }} ({{ t.count }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group-enhanced">
+                <span class="filter-label-enhanced">{{ _("时间") }}</span>
+                <select class="filter-select-enhanced" id="date-filter" onchange="applyFilter()">
+                    <option value="">{{ _("全部时间") }}</option>
+                    <option value="today" {% if current_date == 'today' %}selected{% endif %}>{{ _("今天") }}</option>
+                    <option value="this_week" {% if current_date == 'this_week' %}selected{% endif %}>{{ _("本周") }}</option>
+                    <option value="this_month" {% if current_date == 'this_month' %}selected{% endif %}>{{ _("本月") }}</option>
+                    <option value="older" {% if current_date == 'older' %}selected{% endif %}>{{ _("更早") }}</option>
+                </select>
+            </div>
+            
+            <div class="search-box-enhanced">
+                <i class="bi bi-search search-icon-enhanced"></i>
+                <input type="text" class="search-input-enhanced" id="search-input" placeholder="{{ _("搜索报告...") }}" oninput="searchReports()">
+            </div>
+            
+            <div class="view-toggle-enhanced">
+                <button class="view-btn-enhanced active" id="list-view-btn" onclick="switchView('list')" title="{{ _("列表视图") }}">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+                <button class="view-btn-enhanced" id="grid-view-btn" onclick="switchView('grid')" title="{{ _("网格视图") }}">
+                    <i class="bi bi-grid-3x2"></i>
+                </button>
+            </div>
+            
+            <button class="expand-btn-enhanced" onclick="toggleAllGroups()">
+                <i class="bi bi-arrows-expand me-1"></i>
+                <span id="expand-text">{{ _("展开全部") }}</span>
+            </button>
+        </div>
+        
+        <div id="reports-content" class="animate-fade-in-up delay-2">
+        {% if total_count > 0 %}
+            {% for group_key, group_data in grouped_reports.items() %}
+                {% if group_data.reports|length > 0 %}
+                <div class="date-group-enhanced" data-group="{{ group_key }}">
+                    <div class="group-header-enhanced" onclick="toggleGroup('{{ group_key }}')">
+                        <div class="group-left-enhanced">
+                            <div class="group-toggle-enhanced {% if group_key != 'today' %}collapsed{% endif %}">
+                                <i class="bi bi-chevron-down"></i>
+                            </div>
+                            <span class="group-label-enhanced">{{ group_data.label }}</span>
+                            <span class="group-count-enhanced">{{ group_data.reports|length }}</span>
+                        </div>
+                        <i class="bi bi-three-dots text-muted"></i>
+                    </div>
+                    
+                    <div class="group-content-enhanced {% if group_key != 'today' %}collapsed{% endif %}" id="group-{{ group_key }}">
+                        <div class="report-list-enhanced">
+                            {% for report in group_data.reports %}
+                            <div class="report-card-enhanced" data-title="{{ report.title }}" onclick="viewReport('{{ report.report_type }}', '{{ report.report_id }}')">
+                                <div class="report-info-enhanced">
+                                    <div class="report-icon-enhanced">
+                                        <i class="bi bi-file-earmark-medical"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title-enhanced">{{ report.title }}</div>
+                                        <div class="report-meta-enhanced">
+                                            <span class="meta-tag-enhanced {% if report.meta.eye == 'L' %}eye-left{% else %}eye-right{% endif %}">
+                                                <i class="bi bi-eye"></i>
+                                                {{ report.meta.eye_display or report.meta.eye }}
+                                            </span>
+                                            {% if report.meta.test_mode %}
+                                            <span class="meta-tag-enhanced">
+                                                <i class="bi bi-gear"></i>
+                                                {{ report.meta.test_mode }}
+                                            </span>
+                                            {% endif %}
+                                            {% if report.meta.total_points %}
+                                            <span class="meta-tag-enhanced">
+                                                <i class="bi bi-bullseye"></i>
+                                                {{ report.meta.total_points }} {{ _("点") }}
+                                            </span>
+                                            {% endif %}
+                                            <span class="status-badge-enhanced {% if report.is_completed %}status-completed-enhanced{% else %}status-partial-enhanced{% endif %}">
+                                                {% if report.is_completed %}{{ _("完成") }}{% else %}{{ _("部分") }}{% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="report-time-enhanced">
+                                    {{ report.created_at.strftime('%H:%M') if group_key == 'today' else report.created_at.strftime('%Y-%m-%d') }}
+                                </div>
+                                
+                                <div class="report-actions-enhanced">
+                                    <button class="btn-action-enhanced btn-view-enhanced" onclick="event.stopPropagation(); viewReport('{{ report.report_type }}', '{{ report.report_id }}')" title="{{ _("查看") }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn-action-enhanced btn-delete-enhanced" onclick="event.stopPropagation(); confirmDelete('{{ report.report_type }}', '{{ report.report_id }}')" title="{{ _("删除") }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+        <div class="empty-state-enhanced-reports">
+            <div class="empty-icon-enhanced">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+            <div class="empty-title-enhanced">{{ _("暂无报告记录") }}</div>
+            <div class="empty-desc-enhanced">{{ _("完成测试后将在此显示报告") }}</div>
+            <a href="{{ url_for('vision.vision_dashboard') }}" class="empty-btn-enhanced">
+                <i class="bi bi-eye-fill"></i>
+                <span>{{ _("开始视野测试") }}</span>
+            </a>
+        </div>
+        {% endif %}
+        </div>
+        
+        <div id="no-results" class="no-results-enhanced" style="display: none;">
+            <div class="no-results-icon-enhanced">
+                <i class="bi bi-search"></i>
+            </div>
+            <div>{{ _("未找到匹配的报告") }}</div>
+        </div>
+    </main>
+
+    {% include '_footer.html' %}
+
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hub.js') }}"></script>
+    <script>
+    initHubDashboard('{{ user.theme }}');
+    
+    var currentView = 'list';
+    var allExpanded = false;
+    
+    function switchView(view) {
+        currentView = view;
+        var content = document.getElementById('reports-content');
+        var listBtn = document.getElementById('list-view-btn');
+        var gridBtn = document.getElementById('grid-view-btn');
+        
+        if (view === 'grid') {
+            content.classList.add('grid-view');
+            listBtn.classList.remove('active');
+            gridBtn.classList.add('active');
+        } else {
+            content.classList.remove('grid-view');
+            listBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+        }
+    }
+    
+    function toggleGroup(groupKey) {
+        var content = document.getElementById('group-' + groupKey);
+        var toggle = document.querySelector('[data-group="' + groupKey + '"] .group-toggle-enhanced');
+        
+        if (content.classList.contains('collapsed')) {
+            content.classList.remove('collapsed');
+            toggle.classList.remove('collapsed');
+        } else {
+            content.classList.add('collapsed');
+            toggle.classList.add('collapsed');
+        }
+    }
+    
+    function toggleAllGroups() {
+        var groups = document.querySelectorAll('.group-content-enhanced');
+        var toggles = document.querySelectorAll('.group-toggle-enhanced');
+        allExpanded = !allExpanded;
+        
+        groups.forEach(function(g) {
+            if (allExpanded) {
+                g.classList.remove('collapsed');
+            } else {
+                g.classList.add('collapsed');
+            }
+        });
+        
+        toggles.forEach(function(t) {
+            if (allExpanded) {
+                t.classList.remove('collapsed');
+            } else {
+                t.classList.add('collapsed');
+            }
+        });
+        
+        document.getElementById('expand-text').textContent = allExpanded ? '{{ _("折叠全部") }}' : '{{ _("展开全部") }}';
+    }
+    
+    function applyFilter() {
+        var typeFilter = document.getElementById('type-filter').value;
+        var dateFilter = document.getElementById('date-filter').value;
+        
+        var url = new URL(window.location.href);
+        if (typeFilter) url.searchParams.set('type', typeFilter);
+        else url.searchParams.delete('type');
+        
+        if (dateFilter) url.searchParams.set('date', dateFilter);
+        else url.searchParams.delete('date');
+        
+        window.location.href = url.toString();
+    }
+    
+    function searchReports() {
+        var query = document.getElementById('search-input').value.toLowerCase();
+        var cards = document.querySelectorAll('.report-card-enhanced');
+        var groups = document.querySelectorAll('.date-group-enhanced');
+        var hasResults = false;
+        
+        cards.forEach(function(card) {
+            var title = card.getAttribute('data-title').toLowerCase();
+            if (title.includes(query)) {
+                card.style.display = '';
+                hasResults = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        groups.forEach(function(group) {
+            var visibleCards = group.querySelectorAll('.report-card-enhanced:not([style*="display: none"])');
+            if (visibleCards.length === 0) {
+                group.style.display = 'none';
+            } else {
+                group.style.display = '';
+            }
+        });
+        
+        document.getElementById('no-results').style.display = hasResults ? 'none' : '';
+    }
+    
+    function viewReport(reportType, reportId) {
+        if (reportType === 'vision') {
+            window.location.href = '/reports/vision/' + reportId;
+        }
+    }
+    
+    function confirmDelete(reportType, reportId) {
+        if (confirm('{{ _("确定要删除此报告吗？此操作不可撤销。") }}')) {
+            deleteReport(reportType, reportId);
+        }
+    }
+    
+    function deleteReport(reportType, reportId) {
+        fetch('/' + reportType + '/record/delete/' + reportId, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('{{ _("删除失败") }}');
+            }
+        });
+    }
+    </script>
+</body>
+</html>

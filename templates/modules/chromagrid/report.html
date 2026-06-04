@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
+<head>
+    <title>{{ _("变色方格表报告") }} - Lumina Tracer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/hub.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-base.css') }}" rel="stylesheet">
+
+    <style>
+        .report-main { max-width: 800px; margin: 0 auto; padding: 80px 30px 30px; }
+
+        .report-card {
+            background: white; padding: 32px; border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-bottom: 28px;
+            border: 1px solid #eef0f3;
+        }
+
+        .report-title {
+            margin-top: 0; margin-bottom: 24px; font-size: 1.4em; color: #2c3e50;
+            border-bottom: 2px solid #f8f9fa; padding-bottom: 16px; font-weight: 700;
+        }
+
+        .report-meta {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .meta-item {
+            padding: 12px 16px; background: #f8f9fa; border-radius: 10px;
+        }
+        .meta-label { font-size: 0.8em; color: #6c757d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .meta-value { font-size: 1.05em; color: #2c3e50; font-weight: 600; }
+
+        .grid-preview {
+            width: 100%; max-width: 400px; margin: 24px auto; display: block;
+            border: 2px solid #e9ecef; border-radius: 8px;
+        }
+
+        .color-swatch {
+            display: inline-block; width: 20px; height: 20px; border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.15); vertical-align: middle; margin-right: 6px;
+        }
+
+        .action-bar {
+            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 10px 24px; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            text-decoration: none; font-size: 0.95em;
+        }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-primary { background: #6f42c1; color: white; }
+        .btn-primary:hover { background: #5a32a3; }
+
+        .disclaimer {
+            margin-top: 24px; padding: 16px; background: #fff3cd;
+            border-radius: 8px; border-left: 4px solid #ffc107;
+            font-size: 0.88em; color: #856404; line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="hub-body">
+
+    {% include '_navbar.html' %}
+
+    <main class="report-main">
+        <div class="report-card">
+            <h2 class="report-title">
+                <i class="bi bi-grid-3x3-gap-fill me-2" style="color: #6f42c1;"></i>
+                {{ _("变色方格表报告") }}
+            </h2>
+
+            <div class="report-meta">
+                <div class="meta-item">
+                    <div class="meta-label">{{ _("测试时间") }}</div>
+                    <div class="meta-value">{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">{{ _("眼别") }}</div>
+                    <div class="meta-value">{% if record.eye == 'L' %}OS ({{ _("左眼") }}){% else %}OD ({{ _("右眼") }}){% endif %}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">{{ _("颜色方案") }}</div>
+                    <div class="meta-value">
+                        {% if record.preset_name %}
+                            {{ record.preset_name }}
+                        {% else %}
+                            {{ _("自定义") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">{{ _("网格大小") }}</div>
+                    <div class="meta-value">{{ record.grid_size }}×{{ record.grid_size }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">{{ _("线色") }}</div>
+                    <div class="meta-value">
+                        <span class="color-swatch" style="background: {{ record.line_color }};"></span>
+                        {{ record.line_color }}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">{{ _("背景色") }}</div>
+                    <div class="meta-value">
+                        <span class="color-swatch" style="background: {{ record.bg_color }};"></span>
+                        {{ record.bg_color }}
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="gridPreview" class="grid-preview" width="400" height="400"></canvas>
+
+            {% if record.marks_data %}
+            <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                {% if record.marks_data.distortions and record.marks_data.distortions|length > 0 %}
+                <span style="background: rgba(255,165,0,0.15); color: #b37400; padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">
+                    <i class="bi bi-bezier2 me-1" style="color: #FFA500;"></i>{{ _("扭曲") }}: {{ record.marks_data.distortions|length }}
+                </span>
+                {% endif %}
+                {% if record.marks_data.scotomas and record.marks_data.scotomas|length > 0 %}
+                <span style="background: rgba(239,68,68,0.15); color: #dc2626; padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">
+                    <i class="bi bi-eraser me-1" style="color: #EF4444;"></i>{{ _("缺损") }}: {{ record.marks_data.scotomas|length }}
+                </span>
+                {% endif %}
+                {% if record.marks_data.blurs and record.marks_data.blurs|length > 0 %}
+                <span style="background: rgba(59,130,246,0.15); color: #2563eb; padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">
+                    <i class="bi bi-droplet-half me-1" style="color: #3B82F6;"></i>{{ _("模糊") }}: {{ record.marks_data.blurs|length }}
+                </span>
+                {% endif %}
+                {% if record.marks_data.floaters and record.marks_data.floaters|length > 0 %}
+                <span style="background: rgba(139,92,246,0.15); color: #7c3aed; padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">
+                    <i class="bi bi-circle me-1" style="color: #8B5CF6;"></i>{{ _("飞蚊") }}: {{ record.marks_data.floaters|length }}
+                </span>
+                {% endif %}
+                {% if record.marks_data.paintStrokes and record.marks_data.paintStrokes|length > 0 %}
+                <span style="background: rgba(34,197,94,0.15); color: #16a34a; padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">
+                    <i class="bi bi-brush me-1" style="color: #22C55E;"></i>{{ _("画笔") }}: {{ record.marks_data.paintStrokes|length }}
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="action-bar">
+                {% if from_param == 'reports' %}
+                    <a href="{{ url_for('reports.dashboard') }}" class="btn btn-secondary">
+                        &larr; {{ _("返回上一界面") }}
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('chromagrid.dashboard') }}" class="btn btn-secondary">
+                        &larr; {{ _("返回上一界面") }}
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="disclaimer">
+                <strong>{{ _("声明") }}：</strong>
+                {{ _("本报告仅供参考，不能替代专业医疗诊断。如有视野异常，请及时就医。") }}
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hub.js') }}"></script>
+    <script>
+        const canvas = document.getElementById('gridPreview');
+        const ctx = canvas.getContext('2d');
+
+        const config = {
+            lineColor: '{{ record.line_color }}',
+            bgColor: '{{ record.bg_color }}',
+            gridSize: {{ record.grid_size }},
+        };
+
+        const marksData = {{ record.marks_data | tojson if record.marks_data else '{}' }};
+
+        function render() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const padding = Math.max(8, Math.min(w, h) * 0.02);
+            const drawW = w - padding * 2;
+            const drawH = h - padding * 2;
+            const gs = config.gridSize;
+
+            ctx.fillStyle = config.bgColor;
+            ctx.fillRect(0, 0, w, h);
+
+            // 计算交叉点（含扭曲偏移）
+            const distortions = marksData.distortions || [];
+            const points = [];
+            for (let r = 0; r <= gs; r++) {
+                points[r] = [];
+                for (let c = 0; c <= gs; c++) {
+                    let dx = 0, dy = 0;
+                    for (const d of distortions) {
+                        const dist = Math.sqrt((r - d.row) ** 2 + (c - d.col) ** 2);
+                        const influence = Math.exp(-dist * dist / 4);
+                        dx += d.dx * influence;
+                        dy += d.dy * influence;
+                    }
+                    points[r][c] = {
+                        x: padding + (c / gs) * drawW + dx * (drawW / gs),
+                        y: padding + (r / gs) * drawH + dy * (drawH / gs),
+                    };
+                }
+            }
+
+            // 画网格线
+            ctx.strokeStyle = config.lineColor;
+            ctx.lineWidth = 1;
+            ctx.lineCap = 'round';
+
+            for (let r = 0; r <= gs; r++) {
+                ctx.beginPath();
+                ctx.moveTo(points[r][0].x, points[r][0].y);
+                for (let c = 1; c <= gs; c++) {
+                    const prev = points[r][c - 1];
+                    const curr = points[r][c];
+                    const cpx = (prev.x + curr.x) / 2;
+                    ctx.quadraticCurveTo(prev.x, prev.y, cpx, (prev.y + curr.y) / 2);
+                }
+                ctx.lineTo(points[r][gs].x, points[r][gs].y);
+                ctx.stroke();
+            }
+            for (let c = 0; c <= gs; c++) {
+                ctx.beginPath();
+                ctx.moveTo(points[0][c].x, points[0][c].y);
+                for (let r = 1; r <= gs; r++) {
+                    const prev = points[r - 1][c];
+                    const curr = points[r][c];
+                    const cpy = (prev.y + curr.y) / 2;
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, cpy);
+                }
+                ctx.lineTo(points[gs][c].x, points[gs][c].y);
+                ctx.stroke();
+            }
+
+            // 中心注视点
+            const cx = padding + drawW / 2;
+            const cy = padding + drawH / 2;
+            const cellSize = Math.min(drawW, drawH) / gs;
+            const dotR = Math.max(3, cellSize * 0.15);
+            ctx.beginPath();
+            ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+            ctx.fillStyle = config.lineColor;
+            ctx.fill();
+
+            // 缺损遮罩
+            for (const s of (marksData.scotomas || [])) {
+                const sx = padding + s.nx * drawW;
+                const sy = padding + s.ny * drawH;
+                const sr = s.nr * Math.min(drawW, drawH);
+                ctx.beginPath();
+                ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                ctx.fillStyle = config.bgColor;
+                ctx.fill();
+            }
+
+            // 模糊效果
+            for (const b of (marksData.blurs || [])) {
+                const bx = padding + b.nx * drawW;
+                const by = padding + b.ny * drawH;
+                const br = b.nr * Math.min(drawW, drawH);
+                const gradient = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+                gradient.addColorStop(0, config.bgColor + 'CC');
+                gradient.addColorStop(0.6, config.bgColor + '88');
+                gradient.addColorStop(1, config.bgColor + '00');
+                ctx.beginPath();
+                ctx.arc(bx, by, br, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
+            // 飞蚊斑点
+            for (const f of (marksData.floaters || [])) {
+                const fx = padding + f.nx * drawW;
+                const fy = padding + f.ny * drawH;
+                const fr = f.nr * Math.min(drawW, drawH);
+                const gradient = ctx.createRadialGradient(fx, fy, 0, fx, fy, fr);
+                gradient.addColorStop(0, `rgba(30,30,30,${f.opacity || 0.4})`);
+                gradient.addColorStop(0.5, `rgba(30,30,30,${(f.opacity || 0.4) * 0.5})`);
+                gradient.addColorStop(1, 'rgba(30,30,30,0)');
+                ctx.beginPath();
+                ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
+            // 画笔涂画
+            for (const stroke of (marksData.paintStrokes || [])) {
+                if (!stroke.points || stroke.points.length < 2) continue;
+                ctx.strokeStyle = stroke.color;
+                ctx.lineWidth = stroke.width || 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.moveTo(padding + stroke.points[0].nx * drawW, padding + stroke.points[0].ny * drawH);
+                for (let i = 1; i < stroke.points.length; i++) {
+                    ctx.lineTo(padding + stroke.points[i].nx * drawW, padding + stroke.points[i].ny * drawH);
+                }
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

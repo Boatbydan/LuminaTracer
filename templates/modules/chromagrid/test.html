@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
+<head>
+    <title>{{ _("变色方格表测试") }} - Lumina Tracer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/hub.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-base.css') }}" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: {{ bg_color }};
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+            transition: background 0.3s;
+        }
+        .canvas-area {
+            flex: 1; display: flex; align-items: center;
+            justify-content: center; overflow: hidden;
+        }
+        #gridCanvas { display: block; }
+
+        /* --- 工具栏 --- */
+        .toolbar {
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.72);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            display: flex; align-items: center;
+            justify-content: center; gap: 6px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            flex-wrap: wrap;
+        }
+        .tool-group {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .tool-divider {
+            width: 1px; height: 26px;
+            background: rgba(255,255,255,0.12);
+            margin: 0 6px;
+        }
+        .tool-btn {
+            padding: 5px 12px; border: 2px solid transparent;
+            border-radius: 18px; font-weight: 600; font-size: 0.8em;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 4px;
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.6);
+        }
+        .tool-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+        .tool-btn.active { color: white; }
+
+        .tool-btn[data-tool="distort"].active {
+            background: rgba(255,165,0,0.22); border-color: #FFA500; color: #FFA500;
+        }
+        .tool-btn[data-tool="scotoma"].active {
+            background: rgba(239,68,68,0.22); border-color: #EF4444; color: #EF4444;
+        }
+        .tool-btn[data-tool="blur"].active {
+            background: rgba(59,130,246,0.22); border-color: #3B82F6; color: #3B82F6;
+        }
+        .tool-btn[data-tool="floater"].active {
+            background: rgba(139,92,246,0.22); border-color: #8B5CF6; color: #8B5CF6;
+        }
+        .tool-btn[data-tool="paint"].active {
+            background: rgba(34,197,94,0.22); border-color: #22C55E; color: #22C55E;
+        }
+
+        .tool-icon { font-size: 1em; }
+        .action-btn {
+            padding: 4px 10px; border: none; border-radius: 14px;
+            font-size: 0.78em; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.5);
+        }
+        .action-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+        .action-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+        .paint-color-input {
+            width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%; cursor: pointer; padding: 1px;
+            background: transparent; display: none;
+        }
+        .paint-color-input.visible { display: inline-block; }
+
+        .brush-size {
+            width: 60px; height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.2); outline: none;
+            -webkit-appearance: none; display: none;
+        }
+        .brush-size.visible { display: inline-block; }
+        .brush-size::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; background: white; cursor: pointer;
+        }
+
+        /* --- 底部控制栏 --- */
+        .control-bar {
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.78);
+            backdrop-filter: blur(10px);
+            padding: 10px 24px;
+            display: flex; align-items: center;
+            justify-content: center; gap: 14px;
+        }
+        .control-bar button {
+            padding: 8px 20px; border: none; border-radius: 8px;
+            font-weight: 600; font-size: 0.9em; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-back { background: rgba(255,255,255,0.15); color: white; }
+        .btn-back:hover { background: rgba(255,255,255,0.25); }
+        .btn-save { background: #28a745; color: white; }
+        .btn-save:hover { background: #218838; }
+        .btn-toggle-bar { background: rgba(255,255,255,0.15); color: white; padding: 6px 12px; font-size: 0.85em; }
+        .info-badge { color: rgba(255,255,255,0.7); font-size: 0.82em; font-weight: 500; }
+
+        /* --- 设置面板 --- */
+        .settings-panel {
+            position: fixed; top: 0; right: -320px;
+            width: 300px; height: 100vh;
+            background: rgba(0,0,0,0.88); backdrop-filter: blur(10px);
+            z-index: 200; padding: 24px;
+            transition: right 0.3s; overflow-y: auto; color: white;
+        }
+        .settings-panel.open { right: 0; }
+        .settings-panel h4 {
+            margin-bottom: 20px; font-size: 1.1em; color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 12px;
+        }
+        .settings-group { margin-bottom: 20px; }
+        .settings-group label {
+            display: block; font-size: 0.85em; color: rgba(255,255,255,0.7);
+            margin-bottom: 8px; font-weight: 500;
+        }
+        .settings-group input[type="color"] {
+            width: 100%; height: 40px; border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px; cursor: pointer; background: transparent; padding: 2px;
+        }
+        .settings-group input[type="range"] {
+            width: 100%; height: 6px; border-radius: 3px;
+            background: rgba(255,255,255,0.2); outline: none; -webkit-appearance: none;
+        }
+        .settings-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: #6f42c1; cursor: pointer;
+        }
+        .settings-value {
+            display: inline-block; background: rgba(111,66,193,0.3); color: #b8a9d4;
+            padding: 3px 10px; border-radius: 12px; font-size: 0.82em;
+            font-weight: 600; margin-left: 8px;
+        }
+        .settings-close {
+            position: absolute; top: 16px; right: 16px;
+            background: none; border: none; color: rgba(255,255,255,0.6);
+            font-size: 1.3em; cursor: pointer;
+        }
+        .settings-close:hover { color: white; }
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 150; display: none;
+        }
+        .overlay.open { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="canvas-area">
+        <canvas id="gridCanvas"></canvas>
+    </div>
+
+    <div class="toolbar" id="toolbar">
+        <div class="tool-group">
+            <button class="tool-btn" data-tool="distort" onclick="selectTool('distort')">
+                <i class="bi bi-bezier2 tool-icon"></i>{{ _("扭曲") }}
+            </button>
+            <button class="tool-btn" data-tool="scotoma" onclick="selectTool('scotoma')">
+                <i class="bi bi-eraser tool-icon"></i>{{ _("缺损") }}
+            </button>
+            <button class="tool-btn" data-tool="blur" onclick="selectTool('blur')">
+                <i class="bi bi-droplet-half tool-icon"></i>{{ _("模糊") }}
+            </button>
+            <button class="tool-btn" data-tool="floater" onclick="selectTool('floater')">
+                <i class="bi bi-circle tool-icon"></i>{{ _("飞蚊") }}
+            </button>
+            <button class="tool-btn" data-tool="paint" onclick="selectTool('paint')">
+                <i class="bi bi-brush tool-icon"></i>{{ _("画笔") }}
+            </button>
+            <input type="color" id="paintColor" class="paint-color-input" value="#FF6B6B">
+            <input type="range" id="brushSize" class="brush-size" min="5" max="40" value="15">
+        </div>
+        <div class="tool-divider"></div>
+        <button class="action-btn" id="undoBtn" onclick="undo()" disabled>
+            <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+        <button class="action-btn" id="clearBtn" onclick="clearEdits()" disabled>
+            <i class="bi bi-trash3"></i>
+        </button>
+    </div>
+
+    <div class="control-bar">
+        <button class="btn-back" onclick="location.href='{{ url_for('chromagrid.dashboard') }}'">
+            <i class="bi bi-arrow-left me-1"></i>{{ _("返回") }}
+        </button>
+        <span class="info-badge" id="infoBadge">
+            {% if eye == 'L' %}OS{% else %}OD{% endif %} | {{ grid_size }}×{{ grid_size }}
+        </span>
+        <button class="btn-toggle-bar" onclick="toggleSettings()">
+            <i class="bi bi-gear me-1"></i>{{ _("设置") }}
+        </button>
+        <button class="btn-save" onclick="saveRecord()">
+            <i class="bi bi-check-lg me-1"></i>{{ _("完成") }}
+        </button>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleSettings()"></div>
+    <div class="settings-panel" id="settingsPanel">
+        <button class="settings-close" onclick="toggleSettings()"><i class="bi bi-x-lg"></i></button>
+        <h4><i class="bi bi-gear me-2"></i>{{ _("方格表设置") }}</h4>
+        <div class="settings-group">
+            <label>{{ _("线色") }}</label>
+            <input type="color" id="lineColorInput" value="{{ line_color }}" onchange="updateConfig()">
+        </div>
+        <div class="settings-group">
+            <label>{{ _("背景色") }}</label>
+            <input type="color" id="bgColorInput" value="{{ bg_color }}" onchange="updateConfig()">
+        </div>
+        <div class="settings-group">
+            <label>{{ _("网格大小") }} <span class="settings-value" id="gridSizeDisplay">{{ grid_size }}×{{ grid_size }}</span></label>
+            <input type="range" id="gridSizeInput" min="5" max="40" value="{{ grid_size }}" step="1" oninput="updateConfig()">
+        </div>
+        <div class="settings-group">
+            <label>{{ _("线条粗细") }} <span class="settings-value" id="lineWidthDisplay">1px</span></label>
+            <input type="range" id="lineWidthInput" min="1" max="4" value="1" step="0.5" oninput="updateConfig()">
+        </div>
+    </div>
+
+    <script>
+    const canvas = document.getElementById('gridCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // --- Config ---
+    const config = {
+        lineColor: '{{ line_color }}',
+        bgColor: '{{ bg_color }}',
+        gridSize: {{ grid_size }},
+        lineWidth: 1,
+        eye: '{{ eye }}',
+        presetName: '{{ preset_name }}',
+    };
+
+    // --- Edit State ---
+    // 扭曲：交叉点偏移 {row, col, dx, dy}（归一化到网格单元）
+    let distortions = [];
+    // 缺损：遮罩圆 {nx, ny, nr}
+    let scotomas = [];
+    // 模糊：模糊圆 {nx, ny, nr}
+    let blurs = [];
+    // 飞蚊：暗色斑 {nx, ny, nr, opacity}
+    let floaters = [];
+    // 画笔：笔画 {color, points: [{nx, ny}]}
+    let paintStrokes = [];
+    let currentPaintStroke = null;
+
+    // 操作历史（用于撤销）
+    let history = [];
+    const MAX_HISTORY = 50;
+
+    let currentTool = null;
+    let isDrawing = false;
+    let dragTarget = null; // 扭曲拖拽目标
+
+    // --- Canvas 尺寸 ---
+    function resizeCanvas() {
+        const area = document.querySelector('.canvas-area');
+        const size = Math.min(area.clientWidth, area.clientHeight);
+        canvas.width = size;
+        canvas.height = size;
+        render();
+    }
+
+    // --- 渲染 ---
+    function render() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const padding = Math.max(8, Math.min(w, h) * 0.02);
+        const drawW = w - padding * 2;
+        const drawH = h - padding * 2;
+        const gs = config.gridSize;
+
+        // 1. 背景
+        ctx.fillStyle = config.bgColor;
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. 计算交叉点（含扭曲偏移）
+        const points = [];
+        for (let r = 0; r <= gs; r++) {
+            points[r] = [];
+            for (let c = 0; c <= gs; c++) {
+                let dx = 0, dy = 0;
+                for (const d of distortions) {
+                    const dist = Math.sqrt((r - d.row) ** 2 + (c - d.col) ** 2);
+                    const influence = Math.exp(-dist * dist / 4);
+                    dx += d.dx * influence;
+                    dy += d.dy * influence;
+                }
+                points[r][c] = {
+                    x: padding + (c / gs) * drawW + dx * (drawW / gs),
+                    y: padding + (r / gs) * drawH + dy * (drawH / gs),
+                };
+            }
+        }
+
+        // 3. 画网格线（用贝塞尔曲线平滑扭曲）
+        ctx.strokeStyle = config.lineColor;
+        ctx.lineWidth = config.lineWidth;
+        ctx.lineCap = 'round';
+
+        // 水平线
+        for (let r = 0; r <= gs; r++) {
+            ctx.beginPath();
+            ctx.moveTo(points[r][0].x, points[r][0].y);
+            for (let c = 1; c <= gs; c++) {
+                const prev = points[r][c - 1];
+                const curr = points[r][c];
+                const cpx = (prev.x + curr.x) / 2;
+                ctx.quadraticCurveTo(prev.x, prev.y, cpx, (prev.y + curr.y) / 2);
+            }
+            const last = points[r][gs];
+            ctx.lineTo(last.x, last.y);
+            ctx.stroke();
+        }
+
+        // 垂直线
+        for (let c = 0; c <= gs; c++) {
+            ctx.beginPath();
+            ctx.moveTo(points[0][c].x, points[0][c].y);
+            for (let r = 1; r <= gs; r++) {
+                const prev = points[r - 1][c];
+                const curr = points[r][c];
+                const cpy = (prev.y + curr.y) / 2;
+                ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, cpy);
+            }
+            const last = points[gs][c];
+            ctx.lineTo(last.x, last.y);
+            ctx.stroke();
+        }
+
+        // 4. 中心注视点
+        const cx = padding + drawW / 2;
+        const cy = padding + drawH / 2;
+        const cellSize = Math.min(drawW, drawH) / gs;
+        const dotR = Math.max(3, cellSize * 0.15);
+        ctx.beginPath();
+        ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = config.lineColor;
+        ctx.fill();
+
+        // 5. 缺损遮罩
+        for (const s of scotomas) {
+            const sx = padding + s.nx * drawW;
+            const sy = padding + s.ny * drawH;
+            const sr = s.nr * Math.min(drawW, drawH);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+            ctx.fillStyle = config.bgColor;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 6. 模糊效果（用半透明背景色叠加模拟）
+        for (const b of blurs) {
+            const bx = padding + b.nx * drawW;
+            const by = padding + b.ny * drawH;
+            const br = b.nr * Math.min(drawW, drawH);
+            const gradient = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+            gradient.addColorStop(0, config.bgColor + 'CC');
+            gradient.addColorStop(0.6, config.bgColor + '88');
+            gradient.addColorStop(1, config.bgColor + '00');
+            ctx.beginPath();
+            ctx.arc(bx, by, br, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // 7. 飞蚊斑点
+        for (const f of floaters) {
+            const fx = padding + f.nx * drawW;
+            const fy = padding + f.ny * drawH;
+            const fr = f.nr * Math.min(drawW, drawH);
+            const gradient = ctx.createRadialGradient(fx, fy, 0, fx, fy, fr);
+            gradient.addColorStop(0, `rgba(30,30,30,${f.opacity || 0.4})`);
+            gradient.addColorStop(0.5, `rgba(30,30,30,${(f.opacity || 0.4) * 0.5})`);
+            gradient.addColorStop(1, 'rgba(30,30,30,0)');
+            ctx.beginPath();
+            ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // 8. 画笔涂画
+        for (const stroke of paintStrokes) {
+            drawPaintStroke(stroke, padding, drawW, drawH);
+        }
+        if (currentPaintStroke) {
+            drawPaintStroke(currentPaintStroke, padding, drawW, drawH);
+        }
+    }
+
+    function drawPaintStroke(stroke, padding, drawW, drawH) {
+        if (!stroke.points || stroke.points.length < 2) return;
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = stroke.width || 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(padding + stroke.points[0].nx * drawW, padding + stroke.points[0].ny * drawH);
+        for (let i = 1; i < stroke.points.length; i++) {
+            ctx.lineTo(padding + stroke.points[i].nx * drawW, padding + stroke.points[i].ny * drawH);
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+    }
+
+    // --- 工具选择 ---
+    function selectTool(tool) {
+        if (currentTool === tool) {
+            currentTool = null;
+        } else {
+            currentTool = tool;
+        }
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-tool') === currentTool);
+        });
+
+        const paintColor = document.getElementById('paintColor');
+        const brushSize = document.getElementById('brushSize');
+        paintColor.classList.toggle('visible', currentTool === 'paint');
+        brushSize.classList.toggle('visible', currentTool === 'paint' || currentTool === 'scotoma' || currentTool === 'blur' || currentTool === 'floater');
+
+        canvas.style.cursor = currentTool === 'distort' ? 'grab' :
+                              currentTool ? 'crosshair' : 'default';
+    }
+
+    // --- 坐标转换 ---
+    function canvasToNorm(e) {
+        const rect = canvas.getBoundingClientRect();
+        const sx = canvas.width / rect.width;
+        const sy = canvas.height / rect.height;
+        const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+        const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+        const px = (cx - rect.left) * sx;
+        const py = (cy - rect.top) * sy;
+        const w = canvas.width;
+        const h = canvas.height;
+        const padding = Math.max(8, Math.min(w, h) * 0.02);
+        const drawW = w - padding * 2;
+        const drawH = h - padding * 2;
+        return {
+            nx: (px - padding) / drawW,
+            ny: (py - padding) / drawH,
+            px, py,
+        };
+    }
+
+    function normToGrid(nx, ny) {
+        return {
+            col: nx * config.gridSize,
+            row: ny * config.gridSize,
+        };
+    }
+
+    // --- 交互 ---
+    function handleDown(e) {
+        if (!currentTool) return;
+        e.preventDefault();
+        isDrawing = true;
+        const pos = canvasToNorm(e);
+
+        if (currentTool === 'distort') {
+            const g = normToGrid(pos.nx, pos.ny);
+            const row = Math.round(g.row);
+            const col = Math.round(g.col);
+            if (row >= 0 && row <= config.gridSize && col >= 0 && col <= config.gridSize) {
+                dragTarget = { row, col, startNx: pos.nx, startNy: pos.ny, origDx: 0, origDy: 0 };
+                // 查找已有的扭曲
+                const existing = distortions.find(d => d.row === row && d.col === col);
+                if (existing) {
+                    dragTarget.origDx = existing.dx;
+                    dragTarget.origDy = existing.dy;
+                }
+                canvas.style.cursor = 'grabbing';
+            }
+        } else if (currentTool === 'paint') {
+            currentPaintStroke = {
+                color: document.getElementById('paintColor').value,
+                width: parseInt(document.getElementById('brushSize').value),
+                points: [{ nx: pos.nx, ny: pos.ny }],
+            };
+        }
+        render();
+    }
+
+    function handleMove(e) {
+        if (!isDrawing || !currentTool) return;
+        e.preventDefault();
+        const pos = canvasToNorm(e);
+        const brushR = parseInt(document.getElementById('brushSize').value) / 1000;
+
+        if (currentTool === 'distort' && dragTarget) {
+            const g = normToGrid(pos.nx, pos.ny);
+            const dx = g.col - dragTarget.col - dragTarget.origDx;
+            const dy = g.row - dragTarget.row - dragTarget.origDy;
+            // 更新或添加扭曲点
+            const idx = distortions.findIndex(d => d.row === dragTarget.row && d.col === dragTarget.col);
+            const newD = { row: dragTarget.row, col: dragTarget.col, dx: g.col - dragTarget.col, dy: g.row - dragTarget.row };
+            if (idx >= 0) {
+                distortions[idx] = newD;
+            } else {
+                distortions.push(newD);
+            }
+        } else if (currentTool === 'scotoma') {
+            scotomas.push({ nx: pos.nx, ny: pos.ny, nr: brushR });
+        } else if (currentTool === 'blur') {
+            blurs.push({ nx: pos.nx, ny: pos.ny, nr: brushR });
+        } else if (currentTool === 'floater') {
+            floaters.push({ nx: pos.nx, ny: pos.ny, nr: brushR * 0.6, opacity: 0.35 });
+        } else if (currentTool === 'paint' && currentPaintStroke) {
+            currentPaintStroke.points.push({ nx: pos.nx, ny: pos.ny });
+        }
+        render();
+    }
+
+    function handleUp(e) {
+        if (!isDrawing) return;
+        isDrawing = false;
+
+        if (currentTool === 'distort' && dragTarget) {
+            pushHistory({ type: 'distort', index: distortions.length - 1 });
+            dragTarget = null;
+            canvas.style.cursor = 'grab';
+        } else if (currentTool === 'scotoma') {
+            pushHistory({ type: 'scotoma', count: scotomas.length });
+        } else if (currentTool === 'blur') {
+            pushHistory({ type: 'blur', count: blurs.length });
+        } else if (currentTool === 'floater') {
+            pushHistory({ type: 'floater', count: floaters.length });
+        } else if (currentTool === 'paint' && currentPaintStroke) {
+            paintStrokes.push(currentPaintStroke);
+            pushHistory({ type: 'paint', count: paintStrokes.length });
+            currentPaintStroke = null;
+        }
+
+        updateActionButtons();
+    }
+
+    canvas.addEventListener('mousedown', handleDown);
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('mouseup', handleUp);
+    canvas.addEventListener('mouseleave', () => { if (isDrawing) handleUp(); });
+    canvas.addEventListener('touchstart', handleDown, { passive: false });
+    canvas.addEventListener('touchmove', handleMove, { passive: false });
+    canvas.addEventListener('touchend', handleUp);
+
+    // --- 撤销/清除 ---
+    function pushHistory(entry) {
+        history.push(entry);
+        if (history.length > MAX_HISTORY) history.shift();
+    }
+
+    function undo() {
+        if (history.length === 0) return;
+        const last = history.pop();
+        if (last.type === 'distort') {
+            distortions.splice(last.index, 1);
+        } else if (last.type === 'scotoma') {
+            scotomas.length = last.count > 0 ? last.count - 1 : 0;
+        } else if (last.type === 'blur') {
+            blurs.length = last.count > 0 ? last.count - 1 : 0;
+        } else if (last.type === 'floater') {
+            floaters.length = last.count > 0 ? last.count - 1 : 0;
+        } else if (last.type === 'paint') {
+            paintStrokes.length = last.count > 0 ? last.count - 1 : 0;
+        }
+        updateActionButtons();
+        render();
+    }
+
+    function clearEdits() {
+        if (!confirm('{{ _("确定清除所有编辑吗？") }}')) return;
+        distortions = []; scotomas = []; blurs = []; floaters = [];
+        paintStrokes = []; currentPaintStroke = null; history = [];
+        updateActionButtons();
+        render();
+    }
+
+    function updateActionButtons() {
+        const hasEdits = distortions.length || scotomas.length || blurs.length ||
+                         floaters.length || paintStrokes.length;
+        document.getElementById('undoBtn').disabled = history.length === 0;
+        document.getElementById('clearBtn').disabled = !hasEdits;
+    }
+
+    // --- 设置 ---
+    function updateConfig() {
+        config.lineColor = document.getElementById('lineColorInput').value;
+        config.bgColor = document.getElementById('bgColorInput').value;
+        config.gridSize = parseInt(document.getElementById('gridSizeInput').value);
+        config.lineWidth = parseFloat(document.getElementById('lineWidthInput').value);
+        document.body.style.background = config.bgColor;
+        document.getElementById('gridSizeDisplay').textContent = config.gridSize + '×' + config.gridSize;
+        document.getElementById('lineWidthDisplay').textContent = config.lineWidth + 'px';
+        document.getElementById('infoBadge').textContent =
+            (config.eye === 'L' ? 'OS' : 'OD') + ' | ' + config.gridSize + '×' + config.gridSize;
+        render();
+    }
+
+    function toggleSettings() {
+        document.getElementById('settingsPanel').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('open');
+    }
+
+    // --- 保存 ---
+    function saveRecord() {
+        const marksData = {};
+        if (distortions.length) marksData.distortions = distortions;
+        if (scotomas.length) marksData.scotomas = scotomas;
+        if (blurs.length) marksData.blurs = blurs;
+        if (floaters.length) marksData.floaters = floaters;
+        if (paintStrokes.length) marksData.paintStrokes = paintStrokes;
+
+        fetch('{{ url_for("chromagrid.save_record") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                eye: config.eye,
+                line_color: config.lineColor,
+                bg_color: config.bgColor,
+                grid_size: config.gridSize,
+                preset_name: config.presetName,
+                marks_data: Object.keys(marksData).length > 0 ? marksData : null,
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) window.location.href = data.redirect_url;
+            else alert(data.message || '{{ _("保存失败") }}');
+        })
+        .catch(() => alert('{{ _("网络错误") }}'));
+    }
+
+    // --- 键盘快捷键 ---
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const panel = document.getElementById('settingsPanel');
+            if (panel.classList.contains('open')) toggleSettings();
+        }
+        if (e.key === 's' || e.key === 'S') toggleSettings();
+        if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); undo(); }
+        if (e.key === '1') selectTool('distort');
+        if (e.key === '2') selectTool('scotoma');
+        if (e.key === '3') selectTool('blur');
+        if (e.key === '4') selectTool('floater');
+        if (e.key === '5') selectTool('paint');
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    </script>
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Lumina Tracer - Active Session</title>
+    <link rel="icon" href="data:,">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: none !important;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        #fixation {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 30px; height: 30px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+        }
+        #fixation::before, #fixation::after {
+            content: '';
+            position: absolute;
+            background: #444;
+        }
+        #fixation::before { width: 2px; height: 100%; left: 50%; transform: translateX(-50%); }
+        #fixation::after { width: 100%; height: 2px; top: 50%; transform: translateY(-50%); }
+
+        #stimulus {
+            position: absolute;
+            border-radius: 50%;
+            display: none;
+            pointer-events: none;
+            z-index: 200;
+            box-shadow: 0 0 1px rgba(255,255,255,0.5);
+        }
+
+        #start-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            cursor: pointer !important;
+            transition: opacity 0.4s ease;
+        }
+        #start-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .start-pulse {
+            width: 80px; height: 80px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse-ring 1.8s ease-out infinite;
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
+            70%  { transform: scale(1.15); opacity: 0.5; box-shadow: 0 0 0 20px rgba(255,255,255,0); }
+            100% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+        .start-icon { font-size: 32px; color: #fff; }
+        .start-text {
+            margin-top: 24px;
+            color: rgba(255,255,255,0.85);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .start-sub {
+            margin-top: 8px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+        }
+
+        #controls-panel {
+            position: fixed;
+            top: 0; right: 0;
+            padding: 18px;
+            background: rgba(40, 40, 40, 0.85);
+            border-bottom-left-radius: 10px;
+            color: #ccc;
+            z-index: 3000;
+            opacity: 0.15;
+            transition: opacity 0.3s;
+            cursor: default !important;
+            text-align: right;
+        }
+        #controls-panel:hover { opacity: 1; }
+
+        .btn-stop {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer !important;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .btn-stop:hover { background: #c82333; }
+
+        .camera-toggle {
+            font-size: 12px;
+            color: #aaa;
+            cursor: pointer !important;
+            display: block;
+        }
+        .camera-toggle input { vertical-align: middle; cursor: pointer !important; }
+
+        #webcam-container {
+            position: fixed;
+            bottom: 20px; left: 20px;
+            width: 160px; height: 120px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+            z-index: 2500;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        #webcam-video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        .webcam-label {
+            position: absolute; bottom: 0; width: 100%;
+            background: rgba(0,0,0,0.6);
+            color: white; font-size: 10px;
+            text-align: center; padding: 2px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <div class="start-pulse"><span class="start-icon">&#9654;</span></div>
+        <div class="start-text">{{ _("点击任意位置开始测试") }}</div>
+        <div class="start-sub">{{ _("按空格键也可开始") }}</div>
+    </div>
+
+    <div id="fixation"></div>
+    <div id="stimulus"></div>
+
+    <div id="webcam-container">
+        <video id="webcam-video" autoplay playsinline></video>
+        <div class="webcam-label">{{ _("眼部监控") }}</div>
+    </div>
+
+    <div id="controls-panel">
+        <div style="margin-bottom: 5px; font-size: 0.9em;" id="test-status-text">{{ _("测试进行中...") }}</div>
+        <div style="margin-bottom: 10px; font-size: 0.75em; color: #888;" id="stimulus-status"></div>
+        <button onclick="terminateTest()" class="btn-stop">{{ _("提前结束测试") }}</button>
+
+        <label class="camera-toggle">
+            <input type="checkbox" id="toggle-camera" onchange="toggleWebcam()">
+            {{ _("启用摄像头监控") }}
+        </label>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        var RESPONSE_WINDOW_MS = 1500;
+        var STIMULUS_DURATION_MS = 200;
+        var STIMULUS_DELAY_MIN_MS = 200;
+        var STIMULUS_DELAY_MAX_MS = 500;
+
+        var sessionId = "{{ session['session_id'] }}";
+        var isRunning = false;
+        var currentPointId = null;
+        var stimulusOnTime = 0;
+        var reactionTimer = null;
+        var hasResponded = false;
+        var _onResponse = null;
+        var _stimulusCycleActive = false;
+        var _renderDelayTimer = null;
+        var _renderHideTimer = null;
+        var _pendingNextStimulus = false;
+        var _debugMode = false;
+
+        function _randomDelay() {
+            return Math.floor(Math.random() * (STIMULUS_DELAY_MAX_MS - STIMULUS_DELAY_MIN_MS)) + STIMULUS_DELAY_MIN_MS;
+        }
+
+        function _updateStatus(text) {
+            if (!_debugMode) return;
+            var el = document.getElementById('stimulus-status');
+            if (el) {
+                el.textContent = text;
+            }
+        }
+
+        function _cleanupTimers() {
+            if (_renderDelayTimer) {
+                clearTimeout(_renderDelayTimer);
+                _renderDelayTimer = null;
+            }
+            if (_renderHideTimer) {
+                clearTimeout(_renderHideTimer);
+                _renderHideTimer = null;
+            }
+            if (reactionTimer) {
+                clearTimeout(reactionTimer);
+                reactionTimer = null;
+            }
+            _pendingNextStimulus = false;
+            var el = document.getElementById('stimulus');
+            if (el) el.style.display = 'none';
+        }
+
+        function _releaseCycleLock() {
+            _stimulusCycleActive = false;
+            if (_pendingNextStimulus) {
+                _pendingNextStimulus = false;
+                nextStimulus();
+                return true;
+            }
+            return false;
+        }
+
+
+        var InputManager = (function() {
+            var _enabled = false;
+            var _boundKeyDown = null;
+            var _boundClick = null;
+            var _boundTouch = null;
+            var _lastResponseTime = 0;
+            var _minResponseInterval = 100;
+
+            function enable(responseCallback) {
+                if (_enabled) return;
+                _enabled = true;
+                _onResponse = responseCallback;
+                _lastResponseTime = 0;
+
+                _boundKeyDown = _handleKeyDown.bind(this);
+                _boundClick = _handleClick.bind(this);
+                _boundTouch = _handleTouch.bind(this);
+
+                document.addEventListener('keydown', _boundKeyDown);
+                document.addEventListener('click', _boundClick);
+                document.addEventListener('touchstart', _boundTouch, { passive: true });
+            }
+
+            function disable() {
+                if (!_enabled) return;
+                _enabled = false;
+                _onResponse = null;
+                _lastResponseTime = 0;
+
+                document.removeEventListener('keydown', _boundKeyDown);
+                document.removeEventListener('click', _boundClick);
+                document.removeEventListener('touchstart', _boundTouch);
+
+                _boundKeyDown = null;
+                _boundClick = null;
+                _boundTouch = null;
+            }
+
+            function _tryRespond() {
+                if (!_enabled) return false;
+                
+                var now = Date.now();
+                if (now - _lastResponseTime < _minResponseInterval) {
+                    console.warn('[Input] Ignored rapid click (debounce)');
+                    return false;
+                }
+
+                if (hasResponded) {
+                    console.warn('[Input] Already responded to this stimulus');
+                    return false;
+                }
+
+                var elapsed = now - stimulusOnTime;
+                if (elapsed < 0 || elapsed > RESPONSE_WINDOW_MS + 200) {
+                    console.warn('[Input] Click outside response window (elapsed: ' + elapsed + 'ms)');
+                    return false;
+                }
+
+                _lastResponseTime = now;
+                hasResponded = true;
+                clearTimeout(reactionTimer);
+                
+                if (typeof _onResponse === 'function') {
+                    _onResponse(true, elapsed);
+                }
+                return true;
+            }
+
+            function _handleKeyDown(e) {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    _tryRespond();
+                } else if (e.code === 'Escape') {
+                    e.preventDefault();
+                    terminateTest();
+                }
+            }
+
+            function _handleClick(e) {
+                if (e.target.closest('#controls-panel')) return;
+                _tryRespond();
+            }
+
+            function _handleTouch(e) {
+                if (e.target.closest('#controls-panel')) return;
+                _tryRespond();
+            }
+
+            return { enable: enable, disable: disable };
+        })();
+
+
+        var PointerLockManager = (function() {
+            function requestPointerLock() {
+                try {
+                    var el = document.documentElement;
+                    if (el.requestPointerLock) {
+                        el.requestPointerLock();
+                    } else if (el.webkitRequestPointerLock) {
+                        el.webkitRequestPointerLock();
+                    }
+                } catch(e) {
+                    console.warn('[PointerLock] Not available:', e.message);
+                }
+            }
+
+            function releasePointerLock() {
+                try {
+                    if (document.exitPointerLock) {
+                        document.exitPointerLock();
+                    }
+                } catch(e) {}
+            }
+
+            return {
+                requestPointerLock: requestPointerLock,
+                releasePointerLock: releasePointerLock
+            };
+        })();
+
+
+        async function initTestConfig() {
+            try {
+                var response = await fetch('/api/test/init', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        window_width: window.innerWidth,
+                        window_height: window.innerHeight
+                    })
+                });
+
+                var data = await response.json();
+                if (data.status === 'success' && data.bg_color) {
+                    document.body.style.backgroundColor = data.bg_color;
+                }
+            } catch (err) {
+                console.error('[Init] Failed:', err);
+                document.body.style.backgroundColor = '#000000';
+            }
+        }
+
+        function startTestCycle() {
+            if (isRunning) return;
+            isRunning = true;
+
+            InputManager.enable(function(seen, rt) {
+                submitResult(seen, rt);
+            });
+
+            nextStimulus();
+        }
+
+        function nextStimulus() {
+            if (!isRunning) return;
+            if (_stimulusCycleActive) {
+                _pendingNextStimulus = true;
+                return;
+            }
+
+            _pendingNextStimulus = false;
+            _stimulusCycleActive = true;
+
+            fetch('/api/test/next', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    window_width: window.innerWidth,
+                    window_height: window.innerHeight,
+                    action: 'next'
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.status === 'finished') {
+                    _stimulusCycleActive = false;
+                    finishTest();
+                    return;
+                }
+                if (data.status === 'error') {
+                    console.error('[Next]', data.msg);
+                    if (!_releaseCycleLock()) {
+                        setTimeout(nextStimulus, 2000);
+                    }
+                    return;
+                }
+
+                if (data.bg_color) {
+                    document.body.style.backgroundColor = data.bg_color;
+                }
+
+                currentPointId = data.point_id;
+                renderStimulus(data);
+            })
+            .catch(function(err) {
+                console.error('[Next] Network Error:', err);
+                if (!_releaseCycleLock()) {
+                    setTimeout(nextStimulus, 2000);
+                }
+            });
+        }
+
+        function renderStimulus(data) {
+            if (_renderDelayTimer) {
+                clearTimeout(_renderDelayTimer);
+                _renderDelayTimer = null;
+            }
+            if (_renderHideTimer) {
+                clearTimeout(_renderHideTimer);
+                _renderHideTimer = null;
+            }
+
+            hasResponded = true;
+            stimulusOnTime = 0;
+
+            var el = document.getElementById('stimulus');
+
+            el.style.display = 'none';
+            el.style.left = (data.x - data.size / 2) + 'px';
+            el.style.top = (data.y - data.size / 2) + 'px';
+            el.style.width = data.size + 'px';
+            el.style.height = data.size + 'px';
+            el.style.backgroundColor = 'rgba(255, 255, 255, ' + data.alpha + ')';
+
+            _updateStatus('准备刺激点...');
+
+            var delay = _randomDelay();
+            _renderDelayTimer = setTimeout(function() {
+                _renderDelayTimer = null;
+                if (!isRunning) {
+                    _releaseCycleLock();
+                    _updateStatus('');
+                    return;
+                }
+
+                el.style.display = 'block';
+                stimulusOnTime = Date.now();
+                hasResponded = false;
+                _updateStatus('刺激点显示中...');
+
+                _renderHideTimer = setTimeout(function() {
+                    _renderHideTimer = null;
+                    if (!isRunning) {
+                        _releaseCycleLock();
+                        _updateStatus('');
+                        return;
+                    }
+                    el.style.display = 'none';
+                    if (!_releaseCycleLock()) {
+                        _updateStatus('等待响应...');
+                        waitForResponse();
+                    }
+                }, STIMULUS_DURATION_MS);
+
+            }, delay);
+        }
+
+        function waitForResponse() {
+            if (hasResponded) {
+                nextStimulus();
+                return;
+            }
+            reactionTimer = setTimeout(function() {
+                if (!hasResponded) {
+                    _updateStatus('未检测到响应');
+                    submitResult(false, 0);
+                } else {
+                    _updateStatus('');
+                }
+            }, RESPONSE_WINDOW_MS);
+        }
+
+        function submitResult(seen, rt) {
+            if (!isRunning) return;
+
+            fetch('/api/test/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    point_id: currentPointId,
+                    seen: seen,
+                    reaction_time: rt,
+                    window_width: window.innerWidth,
+                    window_height: window.innerHeight
+                })
+            })
+            .then(function() {
+                if (isRunning) {
+                    _updateStatus('准备下一个...');
+                    nextStimulus();
+                }
+            })
+            .catch(function(err) {
+                console.error('[Submit] Error:', err);
+                if (isRunning) {
+                    _updateStatus('网络错误，重试...');
+                    nextStimulus();
+                }
+            });
+        }
+
+        function finishTest() {
+            isRunning = false;
+            _cleanupTimers();
+            InputManager.disable();
+            PointerLockManager.releasePointerLock();
+            document.body.style.cursor = 'default';
+            window.location.href = '/analysis/report/' + sessionId;
+        }
+
+        async function terminateTest() {
+            if (!confirm("{{ _("确定要提前结束测试并生成报告吗？(未完成区域将使用预测值)") }}")) return;
+
+            isRunning = false;
+            _cleanupTimers();
+            InputManager.disable();
+            PointerLockManager.releasePointerLock();
+
+            var btn = document.querySelector('.btn-stop');
+            if (btn) {
+                btn.innerText = "{{ _("正在保存...") }}";
+                btn.disabled = true;
+            }
+
+            try {
+                var response = await fetch('/api/test/terminate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                var data = await response.json();
+
+                if (response.ok && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    throw new Error(data.error || "Unknown error");
+                }
+
+            } catch (err) {
+                console.error('[Terminate] Error:', err);
+                alert("{{ _("保存数据出错，将强制跳转...") }}");
+                window.location.href = '/analysis/report/' + sessionId;
+            }
+        }
+        window.terminateTest = terminateTest;
+
+        function toggleWebcam() {
+            var video = document.getElementById('webcam-video');
+            var container = document.getElementById('webcam-container');
+            var checkbox = document.getElementById('toggle-camera');
+
+            if (checkbox.checked) {
+                container.style.display = 'block';
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        video.srcObject = stream;
+                    })
+                    .catch(function(err) {
+                        console.log("[Camera] Error:", err);
+                        alert("{{ _("无法调用摄像头，请检查浏览器权限。") }}");
+                        checkbox.checked = false;
+                        container.style.display = 'none';
+                    });
+                }
+            } else {
+                container.style.display = 'none';
+                var stream = video.srcObject;
+                if (stream) {
+                    var tracks = stream.getTracks();
+                    tracks.forEach(function(t) { t.stop(); });
+                    video.srcObject = null;
+                }
+            }
+        }
+
+
+        function dismissOverlayAndStart() {
+            var overlay = document.getElementById('start-overlay');
+
+            overlay.classList.add('hidden');
+            setTimeout(function() {
+                if (overlay.parentNode) {
+                    overlay.style.display = 'none';
+                }
+            }, 450);
+
+            forceHideCursor();
+            setTimeout(startTestCycle, 200);
+        }
+
+        function forceHideCursor() {
+            document.body.style.cursor = 'none';
+            document.documentElement.style.cursor = 'none';
+            // Periodic reinforcement — lightweight, no DOM traversal
+            setInterval(function() {
+                document.body.style.cursor = 'none';
+                document.documentElement.style.cursor = 'none';
+            }, 3000);
+        }
+
+
+        window.onload = function() {
+            initTestConfig().then(function() {
+                var overlay = document.getElementById('start-overlay');
+                var started = false;
+
+                function handleStartGesture(e) {
+                    if (started) return;
+                    started = true;
+
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    dismissOverlayAndStart();
+                }
+
+                overlay.addEventListener('click', handleStartGesture);
+                overlay.addEventListener('touchend', handleStartGesture);
+
+                document.addEventListener('keydown', function onFirstKey(e) {
+                    if (started) return;
+                    if (e.code === 'Space' || e.code === 'Enter') {
+                        e.preventDefault();
+                        handleStartGesture(e);
+                    }
+                });
+            });
+        };
+
+    })();
+    </script>
+</body>
+</html>

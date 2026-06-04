@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-bs-theme="{{ user.theme }}">
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>参考测试 - Lumina Tracer</title>
+    <title>{{ _("参考测试") }} - Lumina Tracer</title>
     <link rel="icon" href="data:,">
     
     <!-- Bootstrap 5 CSS (local) -->
@@ -50,33 +50,33 @@
 
     <main class="ref-main">
         <div class="ref-card">
-            <h2><i class="bi bi-arrow-repeat me-2"></i>参考测试 / Reference Test</h2>
-            <p class="text-muted mb-3">选择之前的测试结果作为参考，只测试异常点位</p>
+            <h2><i class="bi bi-arrow-repeat me-2"></i>{{ _("参考测试") }}</h2>
+            <p class="text-muted mb-3">{{ _("选择之前的测试结果作为参考，只测试异常点位") }}</p>
 
             <form action="{{ url_for('vision.confirm_incremental_test') }}" method="POST">
                 <div class="form-group">
-                    <label class="form-label">参考测试记录</label>
+                    <label class="form-label">{{ _("参考测试记录") }}</label>
                     <select id="reference_session_id" name="reference_session_id" class="form-select" required>
-                        <option value="">-- 选择测试记录 --</option>
+                        <option value="">-- {{ _("选择测试记录") }} --</option>
                         {% for record in records %}
                         <option value="{{ record.session_id }}">
-                            {{ record.created_at.strftime('%Y-%m-%d %H:%M') }} - {{ '左眼' if record.eye == 'L' else '右眼' }} - {{ record.test_mode }}
+                            {{ record.created_at.strftime('%Y-%m-%d %H:%M') }} - {{ _('左眼') if record.eye == 'L' else _('右眼') }} - {{ record.test_mode }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label">测试眼别</label>
+                    <label class="form-label">{{ _("测试眼别") }}</label>
                     <select id="eye" name="eye" class="form-select" required>
-                        <option value="L">左眼 (OS)</option>
-                        <option value="R">右眼 (OD)</option>
+                        <option value="L">{{ _("左眼 (OS)") }}</option>
+                        <option value="R">{{ _("右眼 (OD)") }}</option>
                     </select>
                 </div>
-                
+
                 <div class="text-center mt-4">
-                    <a href="{{ url_for('vision.vision_dashboard') }}" class="btn-action btn-secondary-action">返回</a>
-                    <button type="submit" class="btn-action btn-primary-action">开始测试</button>
+                    <a href="{{ url_for('vision.vision_dashboard') }}" class="btn-action btn-secondary-action">{{ _("返回") }}</a>
+                    <button type="submit" class="btn-action btn-primary-action">{{ _("开始测试") }}</button>
                 </div>
             </form>
         </div>

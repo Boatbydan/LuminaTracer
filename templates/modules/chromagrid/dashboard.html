@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" data-bs-theme="{{ user.theme }}">
+<head>
+    <title>{{ _("变色方格表") }} - Lumina Tracer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/hub.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-base.css') }}" rel="stylesheet">
+
+    <style>
+        .chromagrid-main { max-width: 900px; margin: 0 auto; padding: 80px 30px 30px; }
+
+        .flash-messages { margin-bottom: 20px; }
+        .flash-msg { padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; display: flex; align-items: center; }
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .profile-header {
+            background: linear-gradient(135deg, rgba(111,66,193,0.08) 0%, rgba(111,66,193,0.12) 100%);
+            padding: 28px 32px; border-radius: 16px; margin-bottom: 28px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(111,66,193,0.1);
+            border: 2px solid rgba(111,66,193,0.15);
+            position: relative; overflow: hidden;
+        }
+        .profile-header::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #6f42c1 0%, #9b59b6 100%);
+        }
+
+        .config-card {
+            background: white; padding: 32px; border-radius: 16px;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.08); margin-bottom: 28px;
+            border: 2px solid rgba(111,66,193,0.1);
+            position: relative; overflow: hidden;
+        }
+        .config-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #6f42c1 0%, #9b59b6 100%);
+        }
+        .config-title {
+            margin-top: 0; margin-bottom: 24px; font-size: 1.25em; color: #2c3e50;
+            border-bottom: 2px solid #f8f9fa; padding-bottom: 16px; font-weight: 700;
+        }
+
+        .form-group { margin-bottom: 26px; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 10px; color: #495057; font-size: 0.95em; }
+
+        .eye-selector { display: flex; gap: 20px; }
+        .eye-selector input[type="radio"] { display: none; }
+        .eye-option { flex: 1; cursor: pointer; }
+        .eye-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px; border: 2px solid #e9ecef; border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #6c757d; background: #fff;
+        }
+        .eye-box:hover { border-color: #6f42c1; transform: translateY(-3px); box-shadow: 0 6px 16px rgba(111,66,193,0.1); }
+        .eye-icon {
+            font-size: 20px; font-weight: 800; margin-bottom: 10px;
+            width: 52px; height: 52px; line-height: 52px; text-align: center;
+            background: #f1f3f5; border-radius: 50%; color: #adb5bd; transition: 0.3s;
+        }
+        .eye-selector input:checked + .eye-box {
+            border-color: #6f42c1; background-color: #f5f0ff; color: #6f42c1;
+            box-shadow: 0 6px 20px rgba(111,66,193,0.2);
+        }
+        .eye-selector input:checked + .eye-box .eye-icon {
+            background: #6f42c1; color: white;
+        }
+
+        .preset-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .preset-card {
+            cursor: pointer; border: 2px solid #e9ecef; border-radius: 12px;
+            padding: 16px; text-align: center; transition: all 0.3s;
+            background: #fff;
+        }
+        .preset-card:hover { border-color: #6f42c1; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(111,66,193,0.1); }
+        .preset-card.active { border-color: #6f42c1; background: #f5f0ff; box-shadow: 0 4px 16px rgba(111,66,193,0.2); }
+        .preset-preview {
+            width: 48px; height: 48px; border-radius: 8px; margin: 0 auto 10px;
+            border: 1px solid #dee2e6; position: relative; overflow: hidden;
+        }
+        .preset-name { font-weight: 600; font-size: 0.9em; color: #2c3e50; margin-bottom: 4px; }
+        .preset-desc { font-size: 0.78em; color: #6c757d; }
+
+        .custom-colors {
+            display: none; margin-top: 16px; padding: 20px;
+            background: #f8f9fa; border-radius: 12px; border: 1px solid #e9ecef;
+        }
+        .custom-colors.visible { display: block; }
+        .color-row { display: flex; gap: 20px; align-items: center; margin-bottom: 12px; }
+        .color-input-group { flex: 1; display: flex; align-items: center; gap: 10px; }
+        .color-input-group label { font-weight: 500; font-size: 0.9em; color: #495057; min-width: 60px; }
+        .color-input-group input[type="color"] {
+            width: 44px; height: 44px; border: 2px solid #dee2e6; border-radius: 8px;
+            cursor: pointer; padding: 2px;
+        }
+        .color-input-group input[type="text"] {
+            width: 90px; padding: 8px; border: 1px solid #ced4da; border-radius: 6px;
+            font-family: monospace; font-size: 0.9em;
+        }
+
+        .grid-size-control { display: flex; align-items: center; gap: 16px; }
+        .grid-size-slider {
+            flex: 1; height: 8px; border-radius: 4px; background: #e9ecef;
+            outline: none; -webkit-appearance: none;
+        }
+        .grid-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+            background: #6f42c1; cursor: pointer; transition: all 0.2s;
+        }
+        .grid-size-slider::-webkit-slider-thumb:hover { background: #5a32a3; transform: scale(1.1); }
+        .grid-size-value {
+            display: inline-block; background: #f5f0ff; color: #6f42c1;
+            padding: 5px 14px; border-radius: 15px; font-weight: 600;
+            min-width: 60px; text-align: center;
+        }
+
+        .btn-primary-custom {
+            width: 100%; padding: 16px; color: white; border: none; border-radius: 12px;
+            font-size: 1.1em; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; text-align: center; display: inline-block;
+            text-decoration: none; box-sizing: border-box;
+        }
+        .btn-start-test {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            box-shadow: 0 10px 35px rgba(111,66,193,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+            font-size: 1.2em; padding: 18px;
+            margin-top: 10px; position: relative; overflow: hidden;
+        }
+        .btn-start-test::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn-start-test:hover::before { left: 100%; }
+        .btn-start-test:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(111,66,193,0.45), inset 0 1px 0 rgba(255,255,255,0.3);
+            background: linear-gradient(135deg, #5a32a3 0%, #4a2590 100%);
+        }
+
+        .history-card {
+            background: white; padding: 28px; border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-bottom: 28px;
+            border: 1px solid #eef0f3;
+        }
+        .history-title {
+            margin-top: 0; margin-bottom: 20px; font-size: 1.25em; color: #2c3e50;
+            border-bottom: 2px solid #f8f9fa; padding-bottom: 16px; font-weight: 700;
+        }
+
+        #historyTable { width: 100%; border-collapse: collapse; }
+        #historyTable th {
+            padding: 12px; text-align: left; font-size: 0.85em; color: #6c757d;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        #historyTable td { padding: 12px; border-bottom: 1px solid #f0f2f5; font-size: 0.9em; }
+        #historyTable tbody tr:hover { background: #f8f9fa; }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.78em; font-weight: 600; }
+        .badge-left { background: #e7f3ff; color: #007bff; }
+        .badge-right { background: #fff3e0; color: #fd7e14; }
+        .badge-preset { background: #f5f0ff; color: #6f42c1; }
+        .badge-custom { background: #f0f8f0; color: #28a745; }
+
+        .btn-sm {
+            padding: 6px 14px; border-radius: 8px; font-size: 0.82em; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
+        }
+        .btn-view { background: rgba(111,66,193,0.1); color: #6f42c1; border: 1px solid rgba(111,66,193,0.2); }
+        .btn-view:hover { background: rgba(111,66,193,0.2); }
+        .btn-delete { background: rgba(220,53,69,0.08); color: #dc3545; border: 1px solid rgba(220,53,69,0.15); }
+        .btn-delete:hover { background: rgba(220,53,69,0.15); }
+
+        .color-dot {
+            display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.15); vertical-align: middle; margin-right: 4px;
+        }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #adb5bd; }
+        .empty-state i { font-size: 3em; margin-bottom: 16px; display: block; }
+    </style>
+</head>
+<body class="hub-body">
+
+    {% include '_navbar.html' %}
+
+    <main class="chromagrid-main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+                <i class="bi {{ 'bi-check-circle-fill' if category == 'success' else 'bi-exclamation-circle-fill' }} me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="profile-header">
+            <div>
+                <h2 style="margin:0; font-size: 1.5em; color: #2c3e50; font-weight: 800;">
+                    <i class="bi bi-grid-3x3-gap-fill me-2" style="color: #6f42c1;"></i>{{ _("变色方格表") }}
+                </h2>
+                <span class="user-meta">{{ _("通过可变颜色的阿姆斯勒方格表检测中心视野异常") }}</span>
+            </div>
+            <a href="{{ url_for('hub.dashboard') }}" style="color: #6c757d; text-decoration: none; font-size: 0.9em;">
+                <i class="bi bi-house me-1"></i>{{ _("主页") }}
+            </a>
+        </div>
+
+        <div class="config-card">
+            <h3 class="config-title">
+                <i class="bi bi-sliders me-2" style="color: #6f42c1;"></i>{{ _("测试配置") }}
+            </h3>
+
+            <form id="testForm" onsubmit="return startTest(event)">
+                <div class="form-group">
+                    <label class="form-label">{{ _("选择眼别") }}</label>
+                    <div class="eye-selector">
+                        <label class="eye-option">
+                            <input type="radio" name="eye" value="L" checked>
+                            <div class="eye-box">
+                                <div class="eye-icon">OS</div>
+                                <span style="font-weight: 600;">{{ _("左眼") }}</span>
+                            </div>
+                        </label>
+                        <label class="eye-option">
+                            <input type="radio" name="eye" value="R">
+                            <div class="eye-box">
+                                <div class="eye-icon">OD</div>
+                                <span style="font-weight: 600;">{{ _("右眼") }}</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">{{ _("颜色方案") }}</label>
+                    <div class="preset-grid">
+                        {% for key, preset in color_presets.items() %}
+                        <div class="preset-card" data-preset="{{ key }}" onclick="selectPreset('{{ key }}')">
+                            <div class="preset-preview" style="background: {{ preset.bg }};">
+                                <div style="position:absolute;inset:0;background: repeating-linear-gradient(0deg, {{ preset.line }} 0px, {{ preset.line }} 1px, transparent 1px, transparent 6px), repeating-linear-gradient(90deg, {{ preset.line }} 0px, {{ preset.line }} 1px, transparent 1px, transparent 6px);"></div>
+                            </div>
+                            <div class="preset-name">{{ preset.name }}</div>
+                            <div class="preset-desc">{{ preset.desc }}</div>
+                        </div>
+                        {% endfor %}
+                        <div class="preset-card" data-preset="custom" onclick="selectPreset('custom')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1);">
+                            </div>
+                            <div class="preset-name">{{ _("自定义") }}</div>
+                            <div class="preset-desc">{{ _("自由选择颜色") }}</div>
+                        </div>
+                    </div>
+
+                    <div id="customColors" class="custom-colors">
+                        <div class="color-row">
+                            <div class="color-input-group">
+                                <label>{{ _("线色") }}</label>
+                                <input type="color" id="lineColorPicker" value="#000000" onchange="syncColorInput('line')">
+                                <input type="text" id="lineColorText" value="#000000" onchange="syncColorPicker('line')">
+                            </div>
+                            <div class="color-input-group">
+                                <label>{{ _("背景色") }}</label>
+                                <input type="color" id="bgColorPicker" value="#FFFFFF" onchange="syncColorInput('bg')">
+                                <input type="text" id="bgColorText" value="#FFFFFF" onchange="syncColorPicker('bg')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">{{ _("网格大小") }}</label>
+                    <div class="grid-size-control">
+                        <input type="range" id="gridSizeSlider" class="grid-size-slider" min="5" max="40" value="20" step="1" oninput="updateGridSize()">
+                        <span class="grid-size-value" id="gridSizeValue">20×20</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary-custom btn-start-test">
+                    <i class="bi bi-play-circle-fill me-2"></i>{{ _("开始测试") }}
+                </button>
+            </form>
+        </div>
+
+        <div class="history-card">
+            <h3 class="history-title">
+                <i class="bi bi-clock-history me-2" style="color: #6c757d;"></i>{{ _("测试历史") }}
+            </h3>
+
+            {% if history %}
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th width="20%">{{ _("日期") }}</th>
+                        <th width="12%">{{ _("眼别") }}</th>
+                        <th width="20%">{{ _("颜色方案") }}</th>
+                        <th width="15%">{{ _("网格") }}</th>
+                        <th width="33%" style="text-align: right;">{{ _("操作") }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in history %}
+                    <tr>
+                        <td style="color: #666; font-family: monospace;">
+                            {{ record.created_at.strftime('%Y-%m-%d %H:%M') }}
+                        </td>
+                        <td>
+                            {% if record.eye == 'L' %}
+                                <span class="badge badge-left">OS</span>
+                            {% else %}
+                                <span class="badge badge-right">OD</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.preset_name %}
+                                <span class="badge badge-preset">{{ record.preset_name }}</span>
+                            {% else %}
+                                <span class="badge badge-custom">{{ _("自定义") }}</span>
+                                <span class="color-dot" style="background: {{ record.line_color }};"></span>
+                                <span class="color-dot" style="background: {{ record.bg_color }};"></span>
+                            {% endif %}
+                        </td>
+                        <td style="font-family: monospace; color: #666;">
+                            {{ record.grid_size }}×{{ record.grid_size }}
+                        </td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <a href="{{ url_for('chromagrid.report', session_id=record.session_id) }}" class="btn-sm btn-view" style="display: inline-block;">{{ _("报告") }}</a>
+                            <form action="{{ url_for('chromagrid.delete_record', session_id=record.session_id) }}" method="POST" style="display: inline-block; margin-left: 6px;" onsubmit="return confirm('{{ _("确定要删除此记录吗？此操作不可撤销。") }}');">
+                                <button type="submit" class="btn-sm btn-delete" style="display: inline-block;">{{ _("删除") }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <p>{{ _("暂无测试记录") }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hub.js') }}"></script>
+    <script>
+        const COLOR_PRESETS = {{ color_presets | tojson }};
+        let currentPreset = 'classic';
+
+        function selectPreset(key) {
+            currentPreset = key;
+            document.querySelectorAll('.preset-card').forEach(card => {
+                card.classList.toggle('active', card.getAttribute('data-preset') === key);
+            });
+
+            const customColors = document.getElementById('customColors');
+            if (key === 'custom') {
+                customColors.classList.add('visible');
+            } else {
+                customColors.classList.remove('visible');
+                if (COLOR_PRESETS[key]) {
+                    document.getElementById('lineColorPicker').value = COLOR_PRESETS[key].line;
+                    document.getElementById('lineColorText').value = COLOR_PRESETS[key].line;
+                    document.getElementById('bgColorPicker').value = COLOR_PRESETS[key].bg;
+                    document.getElementById('bgColorText').value = COLOR_PRESETS[key].bg;
+                }
+            }
+        }
+
+        function syncColorInput(type) {
+            if (type === 'line') {
+                document.getElementById('lineColorText').value = document.getElementById('lineColorPicker').value.toUpperCase();
+            } else {
+                document.getElementById('bgColorText').value = document.getElementById('bgColorPicker').value.toUpperCase();
+            }
+        }
+
+        function syncColorPicker(type) {
+            if (type === 'line') {
+                const val = document.getElementById('lineColorText').value;
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    document.getElementById('lineColorPicker').value = val;
+                }
+            } else {
+                const val = document.getElementById('bgColorText').value;
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    document.getElementById('bgColorPicker').value = val;
+                }
+            }
+        }
+
+        function updateGridSize() {
+            const val = document.getElementById('gridSizeSlider').value;
+            document.getElementById('gridSizeValue').textContent = val + '×' + val;
+        }
+
+        function startTest(e) {
+            e.preventDefault();
+
+            const eye = document.querySelector('input[name="eye"]:checked').value;
+            const gridSize = document.getElementById('gridSizeSlider').value;
+            let lineColor, bgColor, presetName;
+
+            if (currentPreset === 'custom') {
+                lineColor = document.getElementById('lineColorPicker').value;
+                bgColor = document.getElementById('bgColorPicker').value;
+                presetName = '';
+            } else if (COLOR_PRESETS[currentPreset]) {
+                lineColor = COLOR_PRESETS[currentPreset].line;
+                bgColor = COLOR_PRESETS[currentPreset].bg;
+                presetName = COLOR_PRESETS[currentPreset].name;
+            } else {
+                lineColor = '#000000';
+                bgColor = '#FFFFFF';
+                presetName = '经典黑白';
+            }
+
+            const params = new URLSearchParams({
+                eye: eye,
+                line_color: lineColor,
+                bg_color: bgColor,
+                grid_size: gridSize,
+                preset_name: presetName,
+            });
+
+            window.location.href = '{{ url_for("chromagrid.test_page") }}?' + params.toString();
+            return false;
+        }
+
+        selectPreset('classic');
+    </script>
+</body>
+</html>

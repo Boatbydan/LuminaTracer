@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{ lang_code }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - Lumina Tracer</title>
+    <title>{{ _("登录") }} - Lumina Tracer</title>
     <link rel="icon" href="data:,">
     <style>
         body {
@@ -11,76 +11,49 @@
             background-color: #050505;
             color: #e0e0e0;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .auth-container {
             display: flex;
-            height: 100%;
+            flex: 1;
             width: 100%;
         }
 
-        /* --- 侧边图片区域 (核心修改) --- */
         .side-image {
-            flex: 1; /* 自动撑开剩余空间 */
-            
-            /* 1. 设置底色 (当图片未填满区域时显示的颜色) */
+            flex: 1;
             background-color: #0f0f0f; 
-            
-            /* 2. 居中显示 */
             background-position: center center;
-            
-            /* 3. 禁止平铺 */
             background-repeat: no-repeat;
-            
-            /* 4. 关键设置：'contain' 会保证正方形完整显示 */
-            /* 如果觉得图片太大，可以改成具体的百分比，例如 '60%' */
             background-size: contain; 
-            
             position: relative;
         }
 
-        /* 左侧图片路径 */
         .side-image.left {
             background-image: url("{{ url_for('static', filename='images/auth_left.jpg') }}");
-            /* 可选：如果你想让图片稍微离中间远一点 */
             background-position: center right 20px; 
         }
         
-        /* 右侧图片路径 */
         .side-image.right {
             background-image: url("{{ url_for('static', filename='images/auth_right.jpg') }}");
-            /* 可选：如果你想让图片稍微离中间远一点 */
             background-position: center left 20px;
         }
 
-        /* --- 中间表单区域 (保持不变) --- */
         .main-content {
             flex: 0 0 480px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #050505;
-            padding: 30px;
-            z-index: 10;
-            /* 给两边加一点阴影，让中间层级更高 */
+            display: flex; justify-content: center; align-items: center;
+            background: #050505; padding: 30px; z-index: 10;
             box-shadow: 0 0 60px rgba(0,0,0,1); 
         }
 
         .auth-card {
-            background: #121212;
-            padding: 40px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid #333;
-            /* 给卡片加一点微光效果 */
+            background: #121212; padding: 40px; border-radius: 16px;
+            width: 100%; max-width: 400px; text-align: center; border: 1px solid #333;
             box-shadow: 0 0 30px rgba(0, 123, 255, 0.1);
         }
 
-        /* ... 以下样式保持不变 ... */
         .logo-area { margin-bottom: 35px; }
         .logo-circle {
             width: 48px; height: 48px;
@@ -119,9 +92,467 @@
             .main-content { flex: 1; }
             .auth-card { box-shadow: none; border: none; background: transparent; }
         }
+
+        /* 登录页面 Footer 基础布局 + 暗色主题适配 */
+        .auth-container + .app-footer {
+            position: relative;
+            z-index: 5;
+            margin-top: auto;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(10, 10, 12, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .auth-container + .app-footer .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .auth-container + .app-footer .footer-left,
+        .auth-container + .app-footer .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .auth-container + .app-footer .footer-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-container + .app-footer .footer-brand i {
+            font-size: 0.9rem;
+        }
+
+        .auth-container + .app-footer .footer-sep {
+            opacity: 0.4;
+        }
+
+        .auth-container + .app-footer .footer-version {
+            color: rgba(255, 255, 255, 0.6);
+            opacity: 0.8;
+            font-size: 0.78rem;
+        }
+
+        .auth-container + .app-footer .footer-center {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .auth-container + .app-footer .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        .auth-container + .app-footer .footer-link:hover {
+            color: #93c5fd;
+            background: rgba(59, 130, 246, 0.15);
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .auth-container + .app-footer .footer-star-btn:hover {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.12);
+        }
+
+        .auth-container + .app-footer .footer-update-btn:hover {
+            color: #6ee7b7;
+            background: rgba(110, 231, 183, 0.12);
+        }
+
+        .auth-container + .app-footer .footer-tutorial-btn:hover {
+            color: #f9a8d4;
+            background: rgba(249, 168, 212, 0.12);
+        }
+
+        .auth-container + .app-footer .footer-notice {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.76rem;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 900px) {
+            .auth-container + .app-footer .footer-content {
+                flex-direction: column;
+                gap: 0.8rem;
+                text-align: center;
+            }
+
+            .auth-container + .app-footer .footer-center {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="language-switcher-container">
+        <div class="dropdown">
+            <button class="btn-language-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false" title="{{ _('切换语言') }}">
+                <span class="lang-icon-wrapper">
+                    <i class="bi bi-globe2"></i>
+                </span>
+                <span class="lang-text">{{ '中文' if lang_code == 'zh' else 'EN' }}</span>
+                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end language-dropdown">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center {% if lang_code == 'zh' %}active{% endif %}"
+                       href="{{ url_for('auth.set_language', lang='zh') }}">
+                        <span class="flag-emoji">🇨🇳</span>
+                        <span class="lang-name">中文</span>
+                        <span class="lang-check">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M13.5 4L6 11.5L2.5 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center {% if lang_code == 'en' %}active{% endif %}"
+                       href="{{ url_for('auth.set_language', lang='en') }}">
+                        <span class="flag-emoji">🇺🇸</span>
+                        <span class="lang-name">English</span>
+                        <span class="lang-check">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M13.5 4L6 11.5L2.5 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <style>
+        .language-switcher-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1050;
+        }
+
+        .btn-language-toggle {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.12),
+                0 8px 24px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-language-toggle::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .btn-language-toggle:hover::before {
+            opacity: 1;
+        }
+
+        .btn-language-toggle:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 4px 16px rgba(0, 0, 0, 0.18),
+                0 12px 40px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-language-toggle:active {
+            transform: translateY(0) scale(0.98);
+            transition-duration: 0.15s;
+            box-shadow:
+                0 1px 4px rgba(0, 0, 0, 0.12),
+                0 4px 12px rgba(0, 0, 0, 0.08),
+                inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-language-toggle:focus {
+            outline: none;
+            box-shadow:
+                0 0 0 3px rgba(59, 130, 246, 0.35),
+                0 2px 8px rgba(0, 0, 0, 0.12),
+                0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .lang-icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            opacity: 0.85;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+        }
+
+        .btn-language-toggle:hover .lang-icon-wrapper {
+            opacity: 1;
+            transform: rotate(15deg);
+        }
+
+        .lang-text {
+            letter-spacing: 0.02em;
+            font-weight: 600;
+        }
+
+        .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            margin-left: 4px;
+            opacity: 0.7;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+        }
+
+        .btn-language-toggle.show .dropdown-arrow {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
+
+        .language-dropdown {
+            background: rgba(20, 20, 22, 0.97);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 8px;
+            min-width: 200px;
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.08),
+                0 16px 48px rgba(0, 0, 0, 0.32),
+                0 32px 96px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            margin-top: 12px !important;
+            animation: dropdownEnter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transform-origin: top right;
+            overflow: hidden;
+        }
+
+        @keyframes dropdownEnter {
+            0% {
+                opacity: 0;
+                transform: scale(0.92) translateY(-12px);
+            }
+            50% {
+                transform: scale(0.98) translateY(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .language-dropdown .dropdown-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 16px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            margin-bottom: 3px;
+            overflow: hidden;
+            animation: itemSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .language-dropdown .dropdown-item:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .language-dropdown .dropdown-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        @keyframes itemSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .language-dropdown .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .language-dropdown .dropdown-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) scaleX(0);
+            width: 3px;
+            height: 55%;
+            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+            border-radius: 0 3px 3px 0;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        .language-dropdown .dropdown-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--item-x, 50%) var(--item-y, 50%), rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .language-dropdown .dropdown-item:hover::after {
+            opacity: 1;
+        }
+
+        .language-dropdown .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.12);
+            color: #ffffff;
+            padding-left: 22px;
+            transform: translateX(3px);
+        }
+
+        .language-dropdown .dropdown-item:hover::before {
+            transform: translateY(-50%) scaleX(1);
+        }
+
+        .language-dropdown .dropdown-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            font-weight: 600;
+        }
+
+        .language-dropdown .dropdown-item.active::before {
+            transform: translateY(-50%) scaleX(1);
+        }
+
+        .flag-emoji {
+            font-size: 22px;
+            line-height: 1;
+            width: 26px;
+            text-align: center;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .language-dropdown .dropdown-item:hover .flag-emoji {
+            transform: scale(1.15) rotate(-3deg);
+        }
+
+        .lang-name {
+            flex: 1;
+            letter-spacing: 0.01em;
+        }
+
+        .lang-check {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            transform: scale(0) rotate(-45deg);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: #3b82f6;
+            filter: drop-shadow(0 1px 3px rgba(59, 130, 246, 0.4));
+        }
+
+        .language-dropdown .dropdown-item.active .lang-check {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        @media (max-width: 768px) {
+            .language-switcher-container {
+                top: 16px;
+                right: 16px;
+            }
+            
+            .btn-language-toggle {
+                padding: 9px 15px;
+                font-size: 13px;
+                border-radius: 12px;
+            }
+
+            .language-dropdown {
+                min-width: 185px;
+                right: -8px !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn-language-toggle,
+            .language-dropdown,
+            .language-dropdown .dropdown-item,
+            .dropdown-arrow,
+            .lang-check,
+            .flag-emoji {
+                transition: none;
+                animation: none;
+            }
+
+            .language-dropdown .dropdown-item {
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+
     <div class="auth-container">
         <div class="side-image left"></div>
 
@@ -135,31 +566,70 @@
                 {% with messages = get_flashed_messages() %}
                   {% if messages %}
                     {% for message in messages %}
-                      <div class="alert">⚠️ {{ message }}</div>
+                      <div class="alert">&#9888; {{ message }}</div>
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
 
                 <form method="POST">
                     <div class="form-group">
-                        <label>邮箱地址 (Email Address)</label>
+                        <label>{{ _("邮箱地址") }}</label>
                         <input type="email" name="email" required placeholder="user@example.com">
                     </div>
                     <div class="form-group">
-                        <label>密码 (Password)</label>
-                        <input type="password" name="password" required placeholder="••••••••">
+                        <label>{{ _("密码") }}</label>
+                        <input type="password" name="password" required placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;">
                     </div>
-                    <button type="submit" class="btn-submit">登录 (Sign In)</button>
+                    <button type="submit" class="btn-submit">{{ _("登录") }}</button>
                 </form>
 
                 <div class="links">
-                    还没有账号？ (Don't have an account?) <br>
-                    <a href="{{ url_for('auth.register') }}" style="display: inline-block; margin-top: 10px; font-size: 1.1em;">注册新账号 (Register Now)</a>
+                    {{ _("还没有账号？") }} <br>
+                    <a href="{{ url_for('auth.register') }}" style="display: inline-block; margin-top: 10px; font-size: 1.1em;">{{ _("注册新账号") }}</a>
                 </div>
             </div>
         </div>
 
         <div class="side-image right"></div>
     </div>
+
+    {% include '_footer.html' %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langToggle = document.querySelector('.btn-language-toggle');
+            const dropdownItems = document.querySelectorAll('.language-dropdown .dropdown-item');
+
+            if (langToggle) {
+                langToggle.addEventListener('mousemove', (e) => {
+                    const rect = langToggle.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    langToggle.style.setProperty('--x', `${x}%`);
+                    langToggle.style.setProperty('--y', `${y}%`);
+                });
+
+                langToggle.addEventListener('mouseleave', () => {
+                    langToggle.style.setProperty('--x', '50%');
+                    langToggle.style.setProperty('--y', '50%');
+                });
+            }
+
+            dropdownItems.forEach(item => {
+                item.addEventListener('mousemove', (e) => {
+                    const rect = item.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    item.style.setProperty('--item-x', `${x}%`);
+                    item.style.setProperty('--item-y', `${y}%`);
+                });
+
+                item.addEventListener('mouseleave', () => {
+                    item.style.setProperty('--item-x', '50%');
+                    item.style.setProperty('--item-y', '50%');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

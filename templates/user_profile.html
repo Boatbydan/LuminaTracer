@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html>
+<html lang="{{ lang_code }}">
 <head>
-    <title>用户中心 - {{ user.name }}</title>
+    <title>{{ _("用户中心") }} - {{ user.name }}</title>
     <meta charset="utf-8">
     <link rel="icon" href="data:,">
     <style>
@@ -124,23 +123,23 @@
                     </div>
                 </div>
                 
-                <h1 style="margin:0; font-size: 1.5em;">Welcome, {{ user.name }}</h1>
-                <span class="user-meta" style="margin-top:5px;">{{ user.age }} Y/O | {{ user.gender }} | ID: {{ user.id }}</span>
+                <h1 style="margin:0; font-size: 1.5em;">{{ _("欢迎，") }}{{ user.name }}</h1>
+                <span class="user-meta" style="margin-top:5px;">{{ user.age }} {{ _("岁") }} | {{ user.gender }} | ID: {{ user.id }}</span>
             </div>
-            <a href="/logout" class="btn-logout">Logout</a>
+            <a href="/logout" class="btn-logout">{{ _("退出登录") }}</a>
         </div>
 
         <div class="config-card">
-            <h3 class="config-title">开始新的视野测试 (Start New Test)</h3>
-            
+            <h3 class="config-title">{{ _("开始新的视野测试") }}</h3>
+
             <div style="margin-bottom: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #007bff;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <h4 style="margin-top: 0; color: #007bff;">设备校准</h4>
-                        <p style="margin-bottom: 0; font-size: 0.9em; color: #495057;">调整距离和亮度设置，确保测试结果的准确性</p>
+                        <h4 style="margin-top: 0; color: #007bff;">{{ _("设备校准") }}</h4>
+                        <p style="margin-bottom: 0; font-size: 0.9em; color: #495057;">{{ _("调整距离和亮度设置，确保测试结果的准确性") }}</p>
                     </div>
                     <a href="/calibration" style="background: #007bff; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;">
-                        前往校准
+                        {{ _("前往校准") }}
                     </a>
                 </div>
             </div>
@@ -148,28 +147,28 @@
             <form action="/prepare_test" method="POST">
                 
                 <div class="form-group">
-                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">选择眼别 (Select Eye):</label>
+                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">{{ _("选择眼别:") }}</label>
                     <div class="eye-selector">
                         <label class="eye-option">
                             <input type="radio" name="eye" value="L" required checked>
                             <div class="eye-box">
                                 <div class="eye-icon">L</div>
-                                <div>左眼 (OS)</div>
+                                <div>{{ _("左眼 (OS)") }}</div>
                             </div>
                         </label>
-                        
+
                         <label class="eye-option">
                             <input type="radio" name="eye" value="R" required>
                             <div class="eye-box">
                                 <div class="eye-icon">R</div>
-                                <div>右眼 (OD)</div>
+                                <div>{{ _("右眼 (OD)") }}</div>
                             </div>
                         </label>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="modeSelect" style="font-weight: bold; margin-bottom: 10px; display: block;">测试策略 (Test Strategy):</label>
+                    <label for="modeSelect" style="font-weight: bold; margin-bottom: 10px; display: block;">{{ _("测试策略:") }}</label>
                     <select name="test_mode" id="modeSelect" class="strategy-select" onchange="updateModeDesc()">
                         {% for mode in modes %}
                             <option value="{{ mode.id }}" data-desc="{{ mode.desc }}">
@@ -178,27 +177,27 @@
                         {% endfor %}
                     </select>
                     <div id="modeDescription" class="mode-desc-box">
-                        加载策略描述中...
+                        {{ _("加载策略描述中...") }}
                     </div>
                 </div>
 
                 <button type="submit" class="btn-start-test">
-                    Initialize Test (开始测试)
+                    {{ _("开始测试") }}
                 </button>
             </form>
         </div>
 
         <div class="history-panel">
-            <h3 style="margin-top:0;">历史记录 (History)</h3>
+            <h3 style="margin-top:0;">{{ _("历史记录") }}</h3>
             {% if history %}
             <table>
                 <thead>
                     <tr>
-                        <th>日期</th>
-                        <th>眼别</th>
-                        <th>模式</th>
-                        <th>状态</th>
-                        <th style="text-align: right;">操作</th> 
+                        <th>{{ _("日期") }}</th>
+                        <th>{{ _("眼别") }}</th>
+                        <th>{{ _("模式") }}</th>
+                        <th>{{ _("状态") }}</th>
+                        <th style="text-align: right;">{{ _("操作") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -207,22 +206,22 @@
                             <td>{{ record.created_at }}</td>
                             <td>
                                 {% if record.eye == 'L' %}
-                                    <span class="badge badge-left">左眼</span>
+                                    <span class="badge badge-left">{{ _("左眼") }}</span>
                                 {% else %}
-                                    <span class="badge badge-right">右眼</span>
+                                    <span class="badge badge-right">{{ _("右眼") }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ record.test_mode or 'Standard' }}</td>
-                            <td><span style="color:#28a745;">完成</span></td>
+                            <td><span style="color:#28a745;">{{ _("完成") }}</span></td>
                             <td style="text-align: right;">
                                 {% if record.session_id %}
-                                    <a href="/analysis/report/{{ record.session_id }}" class="btn-sm btn-view">查看</a>
-                                    
-                                    <form action="/record/delete/{{ record.session_id }}" method="POST" style="display: inline-block; margin-left: 5px;" onsubmit="return confirm('确定要永久删除这条测试记录吗？此操作无法撤销。');">
-                                        <button type="submit" class="btn-sm btn-delete">删除</button>
+                                    <a href="/analysis/report/{{ record.session_id }}" class="btn-sm btn-view">{{ _("查看") }}</a>
+
+                                    <form action="/record/delete/{{ record.session_id }}" method="POST" style="display: inline-block; margin-left: 5px;" onsubmit="return confirm('{{ _("确定要永久删除这条测试记录吗？此操作无法撤销。") }}');">
+                                        <button type="submit" class="btn-sm btn-delete">{{ _("删除") }}</button>
                                     </form>
                                 {% else %}
-                                    <span style="color: red; font-size: 0.8em;">无效数据</span>
+                                    <span style="color: red; font-size: 0.8em;">{{ _("无效数据") }}</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -231,16 +230,16 @@
             </table>
             {% else %}
                 <p style="color:#999; text-align:center; padding: 40px; border: 2px dashed #eee; border-radius: 8px;">
-                    暂无记录，请在上方点击 "开始测试"。
+                    {{ _("暂无记录，请点击上方"开始测试"。") }}
                 </p>
             {% endif %}
         </div>
 
         {% if user.id == 1 %}
         <div class="admin-link">
-            <p style="color: #666; font-size: 0.9em;">系统管理区域</p>
+            <p style="color: #666; font-size: 0.9em;">{{ _("系统管理区域") }}</p>
             <a href="/admin/" style="color: #dc3545; font-weight: bold; text-decoration: none;">
-                &gt;&gt; 进入后台数据库管理系统 &lt;&lt;
+                &gt;&gt; {{ _("进入后台数据库管理系统") }} &lt;&lt;
             </a>
         </div>
         {% endif %}

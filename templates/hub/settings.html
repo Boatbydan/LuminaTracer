@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" data-bs-theme="{{ current_theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Tracer - {{ _("设置") }}</title>
+    <link rel="icon" href="data:,">
+    
+    <!-- Bootstrap 5 CSS (local) -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Bootstrap Icons (local) -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <!-- Hub 定制样式 -->
+    <link href="{{ url_for('static', filename='css/hub.css') }}" rel="stylesheet">
+</head>
+<body class="hub-body">
+
+    <!-- 统一导航栏 -->
+    {% include '_navbar.html' %}
+
+    <!-- 主内容区 -->
+    <main class="hub-main container-fluid px-4 pt-5 mt-5">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show shadow" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- 页面标题 -->
+        <div class="welcome-section mb-4">
+            <h2 class="fw-bold mb-1"><i class="bi bi-gear me-2"></i>{{ _("设置") }}</h2>
+            <p class="text-muted mb-0">{{ _("管理你的偏好和测试参数") }}</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- 左侧：设置表单 -->
+            <div class="col-lg-8">
+                
+                <!-- 外观设置 -->
+                <div class="card border settings-card mb-4">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h6 class="fw-bold mb-0">
+                            <i class="bi bi-palette me-2"></i>外观设置
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('hub.settings') }}" id="themeForm">
+                            <input type="hidden" name="action" value="update_theme">
+                            
+                            <label class="form-label fw-medium">{{ _("主题模式") }}</label>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-check theme-option-card h-100">
+                                        <input class="form-check-input d-none" type="radio" name="theme" 
+                                               id="themeLight" value="light"
+                                               {% if current_theme == 'light' %}checked{% endif %}>
+                                        <label class="form-check-label w-100" for="themeLight">
+                                            <div class="theme-preview border rounded p-3 text-center cursor-pointer 
+                                                {% if current_theme == 'light' %}border-primary bg-primary-subtle{% endif %}"
+                                                data-theme="light">
+                                                <i class="bi bi-sun-fill fs-3 text-warning mb-2 d-block"></i>
+                                                <span class="small fw-medium">{{ _("浅色模式") }}</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check theme-option-card h-100">
+                                        <input class="form-check-input d-none" type="radio" name="theme" 
+                                               id="themeDark" value="dark"
+                                               {% if current_theme == 'dark' %}checked{% endif %}>
+                                        <label class="form-check-label w-100" for="themeDark">
+                                            <div class="theme-preview border rounded p-3 text-center cursor-pointer
+                                                {% if current_theme == 'dark' %}border-primary bg-primary-subtle{% endif %}"
+                                                data-theme="dark">
+                                                <i class="bi bi-moon-stars-fill fs-3 text-indigo mb-2 d-block"></i>
+                                                <span class="small fw-medium">{{ _("深色模式") }}</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check theme-option-card h-100">
+                                        <input class="form-check-input d-none" type="radio" name="theme" 
+                                               id="themeAuto" value="auto"
+                                               {% if current_theme == 'auto' %}checked{% endif %}>
+                                        <label class="form-check-label w-100" for="themeAuto">
+                                            <div class="theme-preview border rounded p-3 text-center cursor-pointer
+                                                {% if current_theme == 'auto' %}border-primary bg-primary-subtle{% endif %}"
+                                                data-theme="auto">
+                                                <i class="bi bi-circle-half fs-3 text-secondary mb-2 d-block"></i>
+                                                <span class="small fw-medium">{{ _("跟随系统") }}</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <label class="form-label fw-medium">{{ _("导航栏位置") }}</label>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="navbarFixed" 
+                                           {% if navbar_fixed %}checked{% endif %}
+                                           onchange="saveNavbarSetting(this.checked)">
+                                    <label class="form-check-label" for="navbarFixed">
+                                        {{ _("固定在页面顶部") }}
+                                    </label>
+                                </div>
+                                <div class="form-text">{{ _("开启后导航栏始终固定在顶部；关闭后导航栏随页面滚动") }}</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-check-lg me-1"></i>{{ _("保存主题设置") }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 语言设置 -->
+                <div class="card border settings-card mb-4">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h6 class="fw-bold mb-0">
+                            <i class="bi bi-translate me-2"></i>Language / 语言设置
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <label for="languageSelect" class="form-label fw-medium">Display Language / 显示语言</label>
+                        <select class="form-select" id="languageSelect">
+                            <option value="zh" {% if user.language == 'zh' %}selected{% endif %}>中文 (简体)</option>
+                            <option value="en" {% if user.language == 'en' %}selected{% endif %}>English</option>
+                        </select>
+                        <div class="form-text">Switch language / 切换后将自动刷新页面</div>
+                    </div>
+                </div>
+
+                <!-- 测试参数设置 -->
+                <div class="card border settings-card mb-4">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h6 class="fw-bold mb-0">
+                            <i class="bi bi-sliders me-2"></i>{{ _("视野测试默认偏好") }}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('hub.settings') }}">
+                            <input type="hidden" name="action" value="update_vision_defaults">
+                            
+                            <div class="mb-3 p-2 rounded bg-info-subtle small text-secondary">
+                                <i class="bi bi-info-circle me-1"></i>{{ _("以下设置仅作为进入测试页面的初始建议值，每次开始测试前你仍需确认实际选择。") }}
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="preferredEye" class="form-label fw-medium">{{ _("偏好眼别") }}</label>
+                                <select class="form-select" id="preferredEye" name="preferred_eye">
+                                    <option value="both" {% if current_eye_pref == 'both' %}selected{% endif %}>
+                                        {{ _("双眼 (OS/OU)") }}
+                                    </option>
+                                    <option value="left" {% if current_eye_pref == 'left' %}selected{% endif %}>
+                                        {{ _("左眼 (OS)") }}
+                                    </option>
+                                    <option value="right" {% if current_eye_pref == 'right' %}selected{% endif %}>
+                                        {{ _("右眼 (OD)") }}
+                                    </option>
+                                </select>
+                                <div class="form-text">{{ _("测试页面将以此作为初始选项，你可随时修改") }}</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="defaultMode" class="form-label fw-medium">{{ _("默认测试模式") }}</label>
+                                <select class="form-select" id="defaultMode" name="default_mode">
+                                    {% for mode in available_modes %}
+                                    <option value="{{ mode.id }}" 
+                                            {% if current_mode_pref == mode.id %}selected{% endif %}>
+                                        {{ mode.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">{{ _("首次进入视野测试时自动选择的模式") }}</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>{{ _("保存参数设置") }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右侧：信息卡片 -->
+            <div class="col-lg-4">
+                
+                <!-- 用户信息卡片 -->
+                <div class="card border mb-4">
+                    <div class="card-body text-center p-4">
+                        <div class="avatar-circle-large bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3">
+                            {{ user.name[0] if user.name else 'U' }}
+                        </div>
+                        <h5 class="fw-bold mb-1">{{ user.name }}</h5>
+                        <p class="text-muted small mb-3">{{ user.email }}</p>
+                        
+                        <hr>
+                        
+                        <div class="text-start small">
+                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                <span class="text-muted"><i class="bi bi-calendar me-2"></i>{{ _("注册时间") }}</span>
+                                <span>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                <span class="text-muted"><i class="bi bi-person me-2"></i>{{ _("年龄") }}</span>
+                                <span>{{ user.age or _('未设置') }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2">
+                                <span class="text-muted"><i class="bi bi-gender-ambiguous me-2"></i>{{ _("性别") }}</span>
+                                <span>{{ {'M': _('男'), 'F': _('女')}.get(user.gender, _('未设置')) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提示信息 -->
+                <div class="card border bg-light-subtle">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-info-circle me-2"></i>{{ _("提示") }}
+                        </h6>
+                        <ul class="small text-muted mb-0 ps-3" style="list-style-type: disc;">
+                            <li>{{ _("主题设置会立即生效并保存到你的账户") }}</li>
+                            <li>{{ _("初始偏好仅作为测试页面的建议值，每次测试前需确认选择") }}</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 返回按钮 -->
+                <a href="{{ url_for('hub.dashboard') }}" 
+                   class="btn btn-outline-secondary w-100 mt-3">
+                    <i class="bi bi-arrow-left me-2"></i>{{ _("返回控制台") }}
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS Bundle (local) -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- Hub 交互逻辑 -->
+    <script src="{{ url_for('static', filename='js/hub.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var currentTheme = '{{ current_theme }}';
+            
+            initHubSettings(currentTheme);
+            
+            // =============================================
+            // 语言切换
+            // =============================================
+            var langSelect = document.getElementById('languageSelect');
+            if (langSelect) {
+                langSelect.addEventListener('change', function() {
+                    var newLang = this.value;
+                    window.location.href = '{{ url_for("auth.set_language", lang="PLACEHOLDER") }}'.replace('PLACEHOLDER', newLang);
+                });
+            }
+            
+            // =============================================
+            // 主题预览卡片点击：完整交互（同步 radio + 应用 + 保存）
+            // =============================================
+            document.querySelectorAll('.theme-preview').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    var theme = this.dataset.theme;
+                    
+                    // 1. 更新视觉高亮
+                    document.querySelectorAll('.theme-preview').forEach(function(p) {
+                        p.classList.remove('border-primary', 'bg-primary-subtle');
+                    });
+                    this.classList.add('border-primary', 'bg-primary-subtle');
+                    
+                    // 2. 同步选中对应的 radio button
+                    var radioId = 'theme' + theme.charAt(0).toUpperCase() + theme.slice(1);
+                    var radio = document.getElementById(radioId);
+                    if (radio) radio.checked = true;
+                    
+                    // 3. 立即应用主题（强制覆盖）
+                    applyThemeDirect(theme);
+                    
+                    // 4. 自动保存到服务端
+                    saveThemeToServerDirect(theme);
+                });
+            });
+            
+            // =============================================
+            // 辅助函数：直接应用主题（绕过 hub.js 的 force=false）
+            // =============================================
+            function applyThemeDirect(theme) {
+                var effective = theme;
+                if (theme === 'auto') {
+                    effective = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-bs-theme', effective);
+                
+                // 同步 navbar toggle 图标
+                var iconEl = document.getElementById('themeIcon');
+                if (iconEl) {
+                    switch (effective) {
+                        case 'light': iconEl.className = 'bi bi-sun-fill'; break;
+                        case 'dark': iconEl.className = 'bi bi-moon-stars-fill'; break;
+                        default: iconEl.className = 'bi bi-circle-half';
+                    }
+                }
+                
+                // 更新 meta theme-color
+                var meta = document.querySelector('meta[name="theme-color"]');
+                if (!meta) {
+                    meta = document.createElement('meta');
+                    meta.name = 'theme-color';
+                    document.head.appendChild(meta);
+                }
+                meta.content = effective === 'dark' ? '#121212' : '#f8f9fa';
+                
+                // 更新共享状态（供 navbar toggle 使用）
+                currentTheme = theme;
+            }
+            
+            // =============================================
+            // 辅助函数：保存到服务端
+            // =============================================
+            function saveThemeToServerDirect(theme) {
+                fetch('/hub/api/preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'theme', value: theme })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.status === 'ok') {
+                        showFlashMsg('主题已切换: ' + getDisplayName(theme), 'success');
+                    }
+                })
+                .catch(function(err) {
+                    console.warn('主题自动保存失败:', err);
+                    showFlashMsg('主题已应用，但保存失败（将使用本地缓存）', 'warning');
+                });
+            }
+            
+            function getDisplayName(t) {
+                return { light: '浅色模式', dark: '深色模式', auto: '跟随系统' }[t] || t;
+            }
+            
+            function showFlashMsg(msg, type) {
+                var container = document.querySelector('.alert-container') || createAlertContainer();
+                var div = document.createElement('div');
+                div.className = 'alert alert-' + (type === 'success' ? 'success' : 'warning') + 
+                               ' alert-dismissible fade show shadow';
+                div.setAttribute('role', 'alert');
+                div.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                container.appendChild(div);
+                setTimeout(function() { 
+                    if (div.parentNode) { div.classList.remove('show'); setTimeout(() => div.remove(), 150); } 
+                }, 2500);
+            }
+            
+            function createAlertContainer() {
+                var c = document.createElement('div');
+                c.className = 'alert-container position-fixed top-0 end-0 p-3';
+                c.style.zIndex = '1100';
+                document.body.appendChild(c);
+                return c;
+            }
+            
+            // =============================================
+            // 导航栏固定设置
+            // =============================================
+            function saveNavbarSetting(fixed) {
+                fetch('/hub/api/preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'navbar_fixed', value: fixed })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.status === 'ok') {
+                        showFlashMsg(fixed ? '导航栏已设置为固定在顶部' : '导航栏已设置为随页面滚动', 'success');
+                        // 刷新页面以应用新设置
+                        setTimeout(function() { window.location.reload(); }, 1000);
+                    }
+                })
+                .catch(function(err) {
+                    console.warn('导航栏设置保存失败:', err);
+                    showFlashMsg('设置保存失败', 'warning');
+                });
+            }
+        });
+    </script>
+
+    {% include '_footer.html' %}
+</body>
+</html>

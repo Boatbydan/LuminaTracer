@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _("测试准备 - 确认环境") }}</title>
+    <link rel="icon" href="data:,">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a2332;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            color: #333;
+            padding: 40px 45px;
+            border-radius: 16px;
+            width: 720px;
+            max-width: 95vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+        }
+        
+        h1 {
+            color: #007bff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+        
+        .config-confirm {
+            background: linear-gradient(135deg, rgba(0,123,255,0.08) 0%, rgba(0,86,179,0.08) 100%);
+            border: 2px solid rgba(0,123,255,0.2);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .config-row {
+            margin: 8px 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #495057;
+        }
+        
+        .config-row strong {
+            color: #007bff;
+            font-weight: 700;
+        }
+        
+        .config-eye {
+            color: #d63384;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+        
+        .config-duration {
+            background: rgba(0,123,255,0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: inline-block;
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .config-duration i {
+            margin-right: 6px;
+        }
+        
+        .input-methods-box {
+            background: linear-gradient(135deg, rgba(13,202,240,0.08) 0%, rgba(13,202,240,0.12) 100%);
+            border: 1px solid rgba(13,202,240,0.2);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 25px;
+        }
+        
+        .input-methods-box h3 {
+            color: #0dcaf0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-methods-box p {
+            color: #495057;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .method-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .method-tag {
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(13,202,240,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0dcaf0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .method-tag:hover {
+            background: rgba(13,202,240,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .alert-box {
+            background: linear-gradient(135deg, rgba(255,193,7,0.08) 0%, rgba(255,193,7,0.12) 100%);
+            border: 1px solid rgba(255,193,7,0.3);
+            border-left: 4px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 30px;
+        }
+        
+        .alert-box h3 {
+            color: #856404;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .alert-box ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .alert-box li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 12px;
+            color: #495057;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .alert-box li::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .alert-box li strong {
+            color: #856404;
+            font-weight: 700;
+        }
+        
+        .btn-start {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #28a745 0%, #208838 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(40,167,69,0.3);
+            margin-bottom: 15px;
+        }
+        
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(40,167,69,0.4);
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        }
+        
+        .btn-back {
+            display: block;
+            text-align: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .btn-back:hover {
+            color: #007bff;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .method-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ _("准备开始测试") }}</h1>
+
+        <div class="config-confirm">
+            <div class="config-row">{{ _("当前受测者：") }}<strong>{{ user.name }}</strong></div>
+            <div class="config-row">{{ _("即将测试：") }}<span class="config-eye">{{ _("左眼") if config.eye == 'L' else _("右眼") }}</span></div>
+            <div class="config-row">{{ _("测试模式：") }}<strong>{{ _("标准模式") if config.mode == 'mode_standard_v1' else _("快速筛查模式") }}</strong></div>
+            {% if config.mode == 'mode_standard_v1' %}
+            <div class="config-duration">
+                <i class="bi bi-clock"></i>{{ _("预计时长：约 8-12 分钟") }}
+            </div>
+            {% elif config.mode == 'mode_fast_v1' %}
+            <div class="config-duration">
+                <i class="bi bi-clock"></i>{{ _("预计时长：约 4-6 分钟") }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="input-methods-box">
+            <h3><i class="bi bi-hand-index-thumb"></i>{{ _("响应方式") }}</h3>
+            <p>{{ _("看到光点时，使用以下任意方式响应：") }}</p>
+            <div class="method-grid">
+                <span class="method-tag"><i class="bi bi-keyboard"></i>{{ _("空格键") }}</span>
+                <span class="method-tag"><i class="bi bi-mouse"></i>{{ _("鼠标点击") }}</span>
+                <span class="method-tag"><i class="bi bi-phone"></i>{{ _("触屏点击") }}</span>
+            </div>
+        </div>
+
+        <div class="alert-box">
+            <h3><i class="bi bi-exclamation-triangle"></i>{{ _("请确认以下环境要求已满足：") }}</h3>
+            <ul>
+                <li>{{ _("请遮挡住您的 ") }}<strong>{{ _("右眼") if config.eye == 'L' else _("左眼") }}</strong>{{ _("，使用眼罩或手掌完全遮挡。") }}</li>
+                <li>{{ _("环境光线已调暗，避免屏幕反光。建议在室内进行测试。") }}</li>
+                <li>{{ _("头部保持固定，眼睛距离屏幕约 50-60 厘米（约一臂距离）。") }}</li>
+                <li>{{ _("测试全程请") }}<strong>{{ _("注视屏幕中央十字") }}</strong>，{{ _("不要转动眼球去追光点。") }}</li>
+                <li>{{ _("保持放松和专注，如果感到疲劳可以短暂休息后再继续。") }}</li>
+                <li>{{ _("测试过程中请勿移动头部或身体，保持坐姿稳定。") }}</li>
+            </ul>
+        </div>
+
+        <a id="btn-start" href="#" class="btn-start" onclick="return false;">
+            <i class="bi bi-play-fill me-2"></i>{{ _("我已准备好，立即开始") }}
+        </a>
+
+        <a href="{{ url_for('vision.vision_dashboard') }}" class="btn-back">
+            <i class="bi bi-arrow-left me-1"></i>{{ _("返回重新设置") }}
+        </a>
+    </div>
+
+    <script>
+    (function() {
+        var btnStart = document.getElementById('btn-start');
+        
+        btnStart.addEventListener('click', function() {
+            window.location.href = '/test';
+        });
+    })();
+    </script>
+</body>
+</html>

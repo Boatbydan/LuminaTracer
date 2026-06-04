@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html>
+<html lang="{{ lang_code }}">
 <head>
-    <title>查看表: {{ table_name }}</title>
+    <title>{{ _("查看表:") }} {{ table_name }}</title>
     <link rel="icon" href="data:,">
     <style>
         body { font-family: monospace; padding: 20px; }
@@ -14,8 +13,8 @@
     </style>
 </head>
 <body>
-    <h2>表: {{ table_name }}</h2>
-    <a href="/admin">&larr; 返回仪表盘</a>
+    <h2>{{ _("表:") }} {{ table_name }}</h2>
+    <a href="/admin">&larr; {{ _("返回仪表盘") }}</a>
     <br><br>
 
     <table>
