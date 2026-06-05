@@ -28,18 +28,22 @@ Currently, it should be able to intuitively reflect whether there are visual fun
 
 ## 📊 Changelog
 
-### 1.0.0
+### v1.0.0
 * Initial release
 * Visual Field Testing: Basic visual field testing, similar to HFA machine testing process, testing for visual field defects
 * Original Mode: Reference testing, based on past test results, detecting changes in current visual field compared to past tests
 * Result Analysis: Provides sensitivity numerical maps and grayscale maps to help users understand test results
 * User profile management, historical test record review, and other features
 
-### 1.1.0
-* Extended user dashboard and customization features
+### v1.1.0
+* Extended user dashboard and customization features, such as theme color selection
 * More elegant code structure
 * Visual Field Testing: Optimized testing process (better interference resistance)
-* Multi-language support
+* Multi-language support, currently supporting Chinese and English
+
+### v1.2.0
+* Test Record Management: More comprehensive test record management features. Supports categorized browsing and record marking.
+* Color-variable Amsler Grid: An original new feature that implements a grid with customizable size and colors, allowing users to draw distortions, blurs, and other visual field issues, providing an intuitive way to reflect visual field conditions.
 
 ---
 
@@ -50,14 +54,13 @@ Currently, it should be able to intuitively reflect whether there are visual fun
 No need to install any code environment, you can directly download the portable version, no installation required, out of the box:
 
 1. **Download**: Go to the [Releases page](https://github.com/Boatbydan/LuminaTracer/releases) to download `LuminaTracer.zip` for your platform.
-2. **Run**: Extract the files and run **`LuminaTracer.exe`** to start.
+2. **Run**: Extract the files and double-click **`LuminaTracer.exe`** to start.
 
 ### 📥 Compile and Run
 #### 1. Environment Preparation
 Ensure your system has the following environment installed:
 * **Python 3.8+**
 * **C++ compiler** (Windows users need to install Visual Studio Build Tools to compile C++ extensions)
-> **Note**: This project is currently mainly tested in Windows 10/11 environment, compatibility testing for Linux/macOS platforms is being prepared.
 
 #### 2. Get the Code
 ```bash
@@ -67,10 +70,6 @@ cd LuminaTracer
 
 #### 3. Installation Steps
 ```bash
-# It is recommended to create a virtual environment (ensure python version is 3.10)
-python -m venv venv
-venv\Scripts\activate
-
 # Install dependencies
 pip install -r requirements.txt
 ```
@@ -81,21 +80,30 @@ pip install -r requirements.txt
 After running **Lumina Tracer**, you will enter the login/registration page.
 Registration: For first-time use, you can register with any email and password you like; there is no verification mechanism. The account must be in email format.
 
-To obtain relatively accurate reference results, please strictly follow the following physical environment requirements:
-
+### 1. Operation Process (Visual Field Testing, v1.0.0+):
+To obtain relatively accurate reference results, please follow the physical environment requirements below:
 * Environment Preparation:
 Keep the room dimly lit to avoid screen glare.
 Keep your eyes at a distance from the screen, approximately allowing your visual field to cover the screen's short edge.
 When testing the left eye, cover the right eye, and vice versa.
-
-### Operation Process:
 
 * Register/Login: Create a profile and fill in your age (this is crucial for calculating normative deviations (TODO: deviation calculation functionality is still being improved)).
 * Start Test: Select the eye and other information on the dashboard.
 * Operation: Always fixate on the cross in the center of the screen. When you sense a light spot flickering in your peripheral vision, immediately press the spacebar.
 * View Report: After the test is completed, the system will automatically generate an analysis report.
 
-### Operation Screenshots
+### 2. Operation Process (Editable Color-variable Grid, v1.2.0+):
+* Select Parameters: Enter the grid function module, choose the desired colors and grid size.
+* Image Editing: Edit corresponding distortions, blurs, and other visual field issues on the grid.
+
+### Feature Screenshots
+* Video Tutorial: [LuminaTracer - Home Visual Field Testing Program](https://www.bilibili.com/video/BV1bLoDBeEWr)
+* v1.2.0 - Color-variable Amsler Grid + Test Record Management
+
+| Grid Editing | Grid Settings | Report Management |
+|---------|---------|---------|
+| ![Grid Editing](image/v1.2.0/grid_report.jpg) | ![Grid Settings](image/v1.2.0/grid_setup.jpg) | ![Report Management](image/v1.2.0/report_manange.jpg) |
+
 * v1.1.0 - Extended dashboard and multi-language support
 
 | User Interface | Settings Interface |

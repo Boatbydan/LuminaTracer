@@ -13,7 +13,7 @@ def admin_required(f):
         
         # 1. 检查是否登录
         if not user_info:
-            return redirect('/')
+            return redirect(url_for('auth.login'))
             
         # 2. 检查权限 (假设只有 ID=1 是管理员)
         # 注意：user_info['id'] 可能是 int 也可能是 str，建议转 int 比较

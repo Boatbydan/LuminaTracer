@@ -1,15 +1,21 @@
+"""
+Legacy API routes — DEPRECATED
+
+All routes have been migrated to app.modules.vision.api_routes.
+This file is kept only for reference and MUST NOT be registered.
+"""
 import base64
 import os
 import tempfile
 import platform
 import subprocess
 import traceback
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, url_for
 from flask_login import current_user, login_required
 from app import db
 from app.models import TestRecord, TestResultDetail
-from app.engine.manager import TestManager
-from app.engine.registry import StrategyRegistry
+from app.modules.vision.engine.manager import TestManager
+from app.modules.vision.engine.registry import StrategyRegistry
 
 # 导入配置
 from app.config import Config
@@ -189,7 +195,7 @@ def terminate_test():
         strategy = manager.get_strategy(session_id)
         if not strategy:
             # 如果内存里没了，说明已经结束了，直接去报告页
-            return jsonify({'status': 'finished', 'redirect_url': f'/analysis/report/{session_id}'})
+            return jsonify({'status': 'finished', 'redirect_url': url_for('vision.analysis_report', session_id=session_id)})
 
         # 2. 强制提取数据 (这里会包含 ZEST 预测的默认值)
         final_results = strategy.get_final_results()
@@ -203,7 +209,7 @@ def terminate_test():
         # 4. 清理内存
         manager.remove_strategy(session_id)
         
-        return jsonify({'status': 'saved', 'redirect_url': f'/analysis/report/{session_id}'})
+        return jsonify({'status': 'saved', 'redirect_url': url_for('vision.analysis_report', session_id=session_id)})
 
     except Exception as e:
         traceback.print_exc()

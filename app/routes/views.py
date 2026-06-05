@@ -1,10 +1,16 @@
+"""
+Legacy page routes — DEPRECATED
+
+All routes have been migrated to app.modules.vision.routes.
+This file is kept only for reference and MUST NOT be registered.
+"""
 import uuid
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from flask_login import login_required, current_user
 from app import db
 from app.models import User, TestRecord, TestResultDetail
-from app.engine.registry import StrategyRegistry
-from app.analysis.report_generator import generate_report_image
+from app.modules.registry import StrategyRegistry
+from app.modules.vision.analysis.report_generator import generate_report_image
 
 bp = Blueprint('views', __name__)
 
@@ -12,20 +18,26 @@ bp = Blueprint('views', __name__)
 @bp.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('views.user_dashboard'))
+        return redirect(url_for('hub.dashboard'))
     return redirect(url_for('auth.login'))
 
-# --- 2. 用户仪表盘 ---
+# --- 1.1 兼容旧路由：/dashboard 重定向到 /dashboard/vision ---
 @bp.route('/dashboard')
 @login_required
 def user_dashboard():
+    """兼容旧链接（user_dashboard），重定向到视野测试仪表盘"""
+    return redirect(url_for('views.vision_dashboard'))
+
+# --- 2. 视野测试仪表盘 ---
+@bp.route('/dashboard/vision')
+@login_required
+def vision_dashboard():
     records = TestRecord.query.filter_by(user_id=current_user.id)\
                               .order_by(TestRecord.created_at.desc())\
                               .all()
     
     history = []
     for r in records:
-        # 使用 len() 获取列表长度
         total_pts = len(r.details) if r.details else 0
         
         history.append({
@@ -38,8 +50,9 @@ def user_dashboard():
     
     available_modes = StrategyRegistry.get_all_modes()
     
-    return render_template('user_dashboard.html', 
-                           user=current_user, 
+    return render_template('vision_dashboard.html', 
+                           user=current_user,
+                           active_page='vision',
                            history=history, 
                            modes=available_modes)
 
@@ -47,7 +60,7 @@ def user_dashboard():
 @bp.route('/user/<int:user_id>')
 @login_required
 def user_profile(user_id):
-    return redirect(url_for('views.user_dashboard'))
+    return redirect(url_for('views.vision_dashboard'))
 
 # --- 3. 准备测试 ---
 @bp.route('/prepare_test', methods=['POST'])
@@ -107,7 +120,10 @@ def prepare_incremental_test():
     # 过滤出完整的测试记录（至少有10个测试点）
     valid_records = [r for r in records if r.details and len(r.details) >= 10]
     
-    return render_template('prepare_incremental_test.html', records=valid_records)
+    return render_template('prepare_incremental_test.html', 
+                           user=current_user,
+                           active_page='vision',
+                           records=valid_records)
 
 # --- 3.2 确认参考测试 ---
 @bp.route('/confirm_incremental_test', methods=['POST'])
@@ -165,9 +181,11 @@ def test_page():
 @bp.route('/calibration')
 @login_required
 def calibration():
-    return render_template('calibration.html')
+    return render_template('calibration.html', 
+                           user=current_user,
+                           active_page='calibration')
 
-from app.analysis.pdf_generator import create_pdf_report
+from app.modules.vision.analysis.pdf_generator import create_pdf_report
 # --- 6. 查看分析报告 (核心修复) ---
 @bp.route('/analysis/report/<session_id>')
 @login_required
@@ -261,4 +279,4 @@ def delete_record(session_id):
     else:
         flash("Record not found or unauthorized", "error")
         
-    return redirect(url_for('views.user_dashboard'))
+    return redirect(url_for('views.vision_dashboard'))
